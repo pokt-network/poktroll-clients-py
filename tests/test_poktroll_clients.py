@@ -1,11 +1,7 @@
 import sys
 from os import path
-
-# TODO_IN_THIS_COMMIT: figure out why this is being problematic....
-sys.path.insert(0, path.abspath(path.join(path.dirname(__file__), "../src")))
-
 import pytest
-from poktroll_clients import *
+from src.poktroll_clients import *
 
 
 def test_events_query_client():
