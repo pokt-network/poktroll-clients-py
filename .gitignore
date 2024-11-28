@@ -150,3 +150,6 @@ Desktop.ini
 
 # Cython debug symbols
 cython_debug/
+
+# Protobuf generated files
+gen/
