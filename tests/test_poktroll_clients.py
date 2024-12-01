@@ -2,6 +2,10 @@ import sys
 from os import path
 import pytest
 from src.poktroll_clients import *
+from gen.cosmos.base.v1beta1.coin_pb2 import Coin
+from gen.poktroll.shared.service_pb2 import ApplicationServiceConfig
+from gen.poktroll.shared.service_pb2 import Service
+from gen.poktroll.application.tx_pb2 import MsgStakeApplication
 
 
 def test_events_query_client():
@@ -42,7 +46,7 @@ def test_tx_client():
     tx_client = TxClient(cfg_ref, "faucet")
 
 
-def test_sign_and_broadcast():
+def test_sign_and_broadcast_any():
     cfg_ref = get_tx_client_deps()
     tx_client = TxClient(cfg_ref, "faucet")
 
@@ -61,10 +65,26 @@ def test_sign_and_broadcast():
     }
     """
 
-    err_ch_ref = tx_client.SignAndBroadcast(send_msg_any_json)
+    err_ch_ref = tx_client.SignAndBroadcastAny(send_msg_any_json)
 
 
-def get_tx_client_deps() -> GoRef:
+def test_sign_and_broadcast():
+    # NB: Staking app1 for svc1.
+    msg = MsgStakeApplication(address="pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4",
+                              stake=(Coin(denom="upokt", amount="100000000")),
+                              services=[(ApplicationServiceConfig(service_id="svc1"))])
+
+    cfg_ref = get_tx_client_deps()
+    tx_client = TxClient(cfg_ref, "app1")
+
+    fut = tx_client.SignAndBroadcast(msg)
+    fut.result()
+
+    # loop = asyncio.get_running_loop()
+    # result = loop.run_until_complete(fut)
+
+
+def get_tx_client_deps() -> go_ref:
     events_query_client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
     block_query_client = BlockQueryClient("http://127.0.0.1:26657")
 

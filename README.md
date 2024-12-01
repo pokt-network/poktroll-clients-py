@@ -21,7 +21,7 @@ pipenv install
 pipenv shell
 
 # (optional) Update protobufs ("pull" from buf.build)
-buf export buf.build/bryanchriswhite/poktroll
+buf export buf.build/pokt-network/poktroll
 
 # Generate protobufs
 buf generate
