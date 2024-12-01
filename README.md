@@ -9,12 +9,18 @@ git clone https://github.com/byanchriswhite/poktroll --branch feat/client-cgo
 ## Build `poktroll` clients shared library & headers
 ```bash
 cd poktroll
+
 go build -o ../poktroll-clients-py/ext/libclients.so -buildmode=c-shared ./pkg/client/cgo_exports
 cp ./pkg/client/cgo_exports/include/client.h ../poktroll-clients-py/ext/client.h
+
+# Start poktroll localnet
+make localnet_up
 ```
 
 ## Development environment setup
 ```bash
+cd poktroll-clients-py
+
 # Install dependencies
 pip install pipenv
 pipenv install
