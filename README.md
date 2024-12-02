@@ -1,6 +1,6 @@
 Python bindings to the [`poktroll` client packages](https://pkg.go.dev/github.com/pokt-network/poktroll@v0.0.10/pkg/client).
 
-## Clone `poktroll` and `poktrool-clients-py`
+## Clone `poktroll` and `poktroll-clients-py`
 ```bash
 git clone https://github.com/bryanchriswhite/poktroll-clients-py
 git clone https://github.com/byanchriswhite/poktroll --branch feat/client-cgo
@@ -10,6 +10,7 @@ git clone https://github.com/byanchriswhite/poktroll --branch feat/client-cgo
 ```bash
 cd poktroll
 
+# Build shared library - NOTE: this will take a while until some import optimizations are done.
 go build -o ../poktroll-clients-py/ext/libclients.so -buildmode=c-shared ./pkg/client/cgo_exports
 cp ./pkg/client/cgo_exports/include/client.h ../poktroll-clients-py/ext/client.h
 
