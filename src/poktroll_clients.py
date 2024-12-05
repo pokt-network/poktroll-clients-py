@@ -7,7 +7,7 @@ from typing import Union, Optional, Dict, Tuple, Callable
 from atomics import INTEGRAL, atomic, INT
 from google.protobuf.message import Message
 
-from cffi import FFI
+from cffi import FFI, FFIError
 
 go_ref = int
 
@@ -89,12 +89,12 @@ libpoktroll_clients = ffi.dlopen("poktroll_clients")
 
 def check_err(err_ptr: ffi.CData):
     if err_ptr[0] != ffi.NULL:
-        raise Exception(ffi.string(err_ptr[0]))
+        raise FFIError(ffi.string(err_ptr[0]))
 
 
 def check_ref(go_ref: go_ref):
-    assert go_ref != -1
-    assert go_ref != 0
+    if go_ref < 1:
+        raise FFIError("unexpected emtpy go_ref")
 
 
 class GoManagedMem:
@@ -262,7 +262,12 @@ class TxClient(GoManagedMem):
             msg_any_json.encode('utf-8')
         )
 
-        check_ref(err_ch_ref)
+        if err_ch_ref == -1:
+            # TODO_IMPROVE: add python structures for AsyncOperation & AsyncContext.
+            # TODO_IMPROVE: extract to AsyncOperation#error_msg() & refactor
+            error_msg = ffi.string(op.ctx.error_msg).decode('utf-8')
+            future.set_exception(FFIError(error_msg))
+
         return await future
 
     async def SignAndBroadcast(self, msg: Message) -> asyncio.Future:
@@ -284,7 +289,10 @@ class TxClient(GoManagedMem):
             len(msg_bz),
         )
 
-        check_ref(err_ch_ref)
+        if err_ch_ref == -1:
+            error_msg = ffi.string(op.ctx.error_msg).decode('utf-8')
+            future.set_exception(FFIError(error_msg))
+
         return await future
 
     def _new_async_operation(self) -> Tuple[ffi.CData, asyncio.Future]:
