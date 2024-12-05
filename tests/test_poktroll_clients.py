@@ -1,16 +1,12 @@
-import sys
-from os import path
 import pytest
-from src.poktroll_clients import *
 from gen.cosmos.base.v1beta1.coin_pb2 import Coin
 from gen.poktroll.shared.service_pb2 import ApplicationServiceConfig
-from gen.poktroll.shared.service_pb2 import Service
 from gen.poktroll.application.tx_pb2 import MsgStakeApplication, MsgUnstakeApplication
+from src.poktroll_clients import *
 
 
 def test_events_query_client():
     client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
-    # TODO_IN_THIS_COMMIT: refactor constructor to error if selfRef is < 1.
     assert client.EventsBytes("tm.event='Tx'") != -1
     assert client.EventsBytes("tm.event='Tx'") != 0
 
@@ -46,11 +42,12 @@ def test_tx_client():
     tx_client = TxClient(cfg_ref, "faucet")
 
 
-def test_sign_and_broadcast_any():
+@pytest.mark.asyncio
+async def test_sign_and_broadcast_any():
     cfg_ref = get_tx_client_deps()
     tx_client = TxClient(cfg_ref, "faucet")
 
-    # NB: MsgSend from faucet to app1.
+    # MsgSend from faucet to app1
     send_msg_any_json = """
     {
       "@type": "type.googleapis.com/cosmos.bank.v1beta1.MsgSend",
@@ -65,27 +62,49 @@ def test_sign_and_broadcast_any():
     }
     """
 
-    err_ch_ref = tx_client.SignAndBroadcastAny(send_msg_any_json)
+    try:
+        await tx_client.SignAndBroadcastAny(send_msg_any_json)
+    except Exception as e:
+        pytest.fail(f"SignAndBroadcastAny failed with error: {str(e)}")
 
 
-def test_sign_and_broadcast():
-    # NB: Unstaking app1.
-    # unstakeApp1Msg = MsgUnstakeApplication(address="pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4")
-
-    stakeApp3Msg = MsgStakeApplication(address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
-                                       stake=(Coin(denom="upokt", amount="100000000")),
-                                       services=[(ApplicationServiceConfig(service_id="svc1"))])
-
+@pytest.mark.asyncio
+async def test_sign_and_broadcast():
     cfg_ref = get_tx_client_deps()
     tx_client = TxClient(cfg_ref, "app3")
 
-    # fut = tx_client.SignAndBroadcast(unstakeApp1Msg)
-    # fut.result()
-    # # loop = asyncio.get_running_loop()
-    # # result = loop.run_until_complete(fut)
+    stake_app3_msg = MsgStakeApplication(
+        address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
+        stake=Coin(denom="upokt", amount="100000000"),
+        services=[ApplicationServiceConfig(service_id="anvil")]
+    )
 
-    fut = tx_client.SignAndBroadcast(stakeApp3Msg)
-    fut.result()
+    try:
+        await tx_client.SignAndBroadcast(stake_app3_msg)
+
+        unstake_app3_msg = MsgUnstakeApplication(
+            address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex"
+        )
+        await tx_client.SignAndBroadcast(unstake_app3_msg)
+    except Exception as e:
+        pytest.fail(f"SignAndBroadcast failed with error: {str(e)}")
+
+
+@pytest.mark.asyncio
+async def test_sign_and_broadcast_error():
+    cfg_ref = get_tx_client_deps()
+    tx_client = TxClient(cfg_ref, "app1")
+
+    # Attempt to stake an already-staked address (app1)
+    stake_app1_msg = MsgStakeApplication(
+        address="pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4",
+        stake=Coin(denom="upokt", amount="1"),
+        services=[ApplicationServiceConfig(service_id="anvil")]
+    )
+
+    with pytest.raises(Exception,
+                      match=r"(.*failed to execute message.*stake amount.*must be higher than previous stake amount.*|.*EOF: error encountered while querying for tx.*)"):
+        await tx_client.SignAndBroadcast(stake_app1_msg)
 
 
 def get_tx_client_deps() -> go_ref:

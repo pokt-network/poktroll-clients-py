@@ -8,6 +8,8 @@ cffi = "*"
 mypy-protobuf = "*"
 asyncio = "*"
 protobuf = "*"
+pytest-asyncio = "*"
+atomics = "*"
 
 [dev-packages]
 pytest = "*"
