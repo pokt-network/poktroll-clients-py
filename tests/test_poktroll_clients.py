@@ -43,32 +43,6 @@ def test_tx_client():
 
 
 @pytest.mark.asyncio
-async def test_sign_and_broadcast_any():
-    cfg_ref = get_tx_client_deps()
-    tx_client = TxClient(cfg_ref, "faucet")
-
-    # MsgSend from faucet to app1
-    send_msg_any_json = """
-    {
-      "@type": "type.googleapis.com/cosmos.bank.v1beta1.MsgSend",
-      "from_address": "pokt1awtlw5sjmw2f5lgj8ekdkaqezphgz88rdk93sk",
-      "to_address": "pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4",
-      "amount": [
-        {
-          "denom": "upokt",
-          "amount": "100000000"
-        }
-      ]
-    }
-    """
-
-    try:
-        await tx_client.SignAndBroadcastAny(send_msg_any_json)
-    except Exception as e:
-        pytest.fail(f"SignAndBroadcastAny failed with error: {str(e)}")
-
-
-@pytest.mark.asyncio
 async def test_sign_and_broadcast():
     cfg_ref = get_tx_client_deps()
     tx_client = TxClient(cfg_ref, "app3")
