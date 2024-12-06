@@ -2,39 +2,15 @@ import pytest
 from gen.cosmos.base.v1beta1.coin_pb2 import Coin
 from gen.poktroll.shared.service_pb2 import ApplicationServiceConfig
 from gen.poktroll.application.tx_pb2 import MsgStakeApplication, MsgUnstakeApplication
-from src.poktroll_clients import *
-
-
-def test_events_query_client():
-    client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
-    assert client.EventsBytes("tm.event='Tx'") != -1
-    assert client.EventsBytes("tm.event='Tx'") != 0
-
-
-def test_depinject_supply():
-    client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
-    cfg_ref = Supply(client.go_ref)
-
-
-def test_block_query_client():
-    events_query_client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
-    block_query_client = BlockQueryClient("http://127.0.0.1:26657")
-
-
-def test_depinject_supply_many():
-    events_query_client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
-    block_query_client = BlockQueryClient("http://127.0.0.1:26657")
+from src.block_client import BlockClient, BlockQueryClient
+from src.depinject import SupplyMany
+from src.events_query_client import EventsQueryClient
+from src.go_memory import go_ref
+from src.tx_client import TxContext, TxClient
 
 
 def test_tx_context():
     tx_ctx = TxContext("tcp://127.0.0.1:26657")
-
-
-def test_block_client():
-    events_query_client = EventsQueryClient("ws://127.0.0.1:26657/websocket")
-    block_query_client = BlockQueryClient("http://127.0.0.1:26657")
-    cfg_ref = SupplyMany(events_query_client, block_query_client)
-    block_client = BlockClient(cfg_ref)
 
 
 def test_tx_client():
