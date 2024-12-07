@@ -1,8 +1,5 @@
 import asyncio
-import importlib
-from concurrent.futures import Future
-from os import path
-from typing import Union, Optional, Dict, Tuple, Callable
+from typing import Union, Optional, Dict, Tuple, Callable, List
 
 from atomics import INTEGRAL, atomic, INT
 from google.protobuf.message import Message
@@ -11,6 +8,7 @@ from cffi import FFI, FFIError
 
 from src import ffi, libpoktroll_clients
 from src.go_memory import GoManagedMem, go_ref, check_err, check_ref
+from src.protobuf import SerializedProto, ProtoMessageArray
 
 
 class TxClient(GoManagedMem):
@@ -34,44 +32,26 @@ class TxClient(GoManagedMem):
         check_err(self.err_ptr)
         check_ref(go_ref)
 
-    async def SignAndBroadcastAny(self, msg_any_json: str) -> asyncio.Future:
+    async def sign_and_broadcast(self, *msgs: Message) -> asyncio.Future:
         """
         Signs and broadcasts a transaction.
-        :param msg_any_json: The transaction to sign and broadcast.
+        :param msgs: The protobuf Message(s) to sign and broadcast.
         :return: Future that completes when the transaction is processed.
         """
-        op, future = self._new_async_operation()
-        err_ch_ref = libpoktroll_clients.TxClient_SignAndBroadcastAny(
-            op,
-            self.go_ref,
-            msg_any_json.encode('utf-8')
-        )
 
-        if err_ch_ref == -1:
-            # TODO_IMPROVE: add python structures for AsyncOperation & AsyncContext.
-            # TODO_IMPROVE: extract to AsyncOperation#error_msg() & refactor
-            error_msg = ffi.string(op.ctx.error_msg).decode('utf-8')
-            future.set_exception(FFIError(error_msg))
-
-        return await future
-
-    async def SignAndBroadcast(self, msg: Message) -> asyncio.Future:
-        """
-        Signs and broadcasts a transaction.
-        :param msg: The protobuf Message to sign and broadcast.
-        :return: Future that completes when the transaction is processed.
-        """
         op, future = self._new_async_operation()
 
-        msg_bz = msg.SerializeToString()
-        msg_type_url = msg.DESCRIPTOR.full_name.encode('utf-8')
+        serialized_msgs = ProtoMessageArray(messages=[
+            SerializedProto(
+                type_url=msg.DESCRIPTOR.full_name,
+                data=msg.SerializeToString()
+            ) for msg in msgs
+        ])
 
-        err_ch_ref = libpoktroll_clients.TxClient_SignAndBroadcast(
+        err_ch_ref = libpoktroll_clients.TxClient_SignAndBroadcastMany(  # <-- line 71
             op,
             self.go_ref,
-            msg_type_url,
-            msg_bz,
-            len(msg_bz),
+            serialized_msgs.to_c_struct(),
         )
 
         if err_ch_ref == -1:
@@ -85,6 +65,7 @@ class TxClient(GoManagedMem):
         Creates a new AsyncOperation with callbacks and associated Future.
         The callbacks are protected from garbage collection by storing in self._callback_fns.
         """
+
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
@@ -95,6 +76,7 @@ class TxClient(GoManagedMem):
 
         # Create AsyncContext
         ctx = ffi.new("AsyncContext *")
+        next_callback_idx = self._callback_idx.fetch_inc()
 
         # Define callbacks
         @ffi.callback("void(AsyncContext*, const void*)")
@@ -102,19 +84,21 @@ class TxClient(GoManagedMem):
             try:
                 loop.call_soon_threadsafe(future.set_result, None)
             finally:
-                self._cleanup_callbacks()
+                self._free_callback(next_callback_idx)
 
         @ffi.callback("void(AsyncContext*, const char*)")
         def error_cb(ctx, error):
             try:
                 error_str = ffi.string(error).decode('utf-8')
                 loop.call_soon_threadsafe(future.set_exception, Exception(error_str))
+            except Exception as e:
+                future.set_exception(e)
             finally:
-                self._cleanup_callbacks()
+                self._free_callback(next_callback_idx)
 
         @ffi.callback("void(AsyncContext*)")
         def cleanup_cb(ctx):
-            self._cleanup_callbacks()
+            self._free_callback(next_callback_idx)
 
         # Create AsyncOperation
         op = ffi.new("AsyncOperation *")
@@ -124,16 +108,15 @@ class TxClient(GoManagedMem):
         op.cleanup = cleanup_cb
 
         # Store callbacks to protect from garbage collection
-        next_callback_idx = self._callback_idx.fetch_inc()
         self._callback_fns[next_callback_idx] = (success_cb, error_cb, cleanup_cb)
 
         return op, future
 
-    def _cleanup_callbacks(self):
+    def _free_callback(self, callback_idx: int):
         """
         Clean up stored callbacks.
         """
-        self._callback_fns.clear()
+        self._callback_fns.pop(callback_idx)
 
 
 class TxContext(GoManagedMem):

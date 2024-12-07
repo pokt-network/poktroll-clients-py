@@ -67,6 +67,18 @@ ffi.cdef("""
 
     go_ref Supply(go_ref go_ref, char **err);
     go_ref SupplyMany(go_ref *go_refs, int num_go_refs, char **err);
+    
+    typedef struct {
+        uint8_t* type_url;
+        size_t type_url_length;
+        uint8_t* data;
+        size_t data_length;
+    } serialized_proto;
+
+    typedef struct {
+        serialized_proto* messages;
+        size_t num_messages;
+    } proto_message_array;
 
     go_ref NewEventsQueryClient(const char* comet_websocket_url);
     go_ref EventsQueryClientEventsBytes(go_ref selfRef, const char* query);
@@ -78,8 +90,8 @@ ffi.cdef("""
     go_ref NewBlockClient(go_ref cfg_ref, char **err);
 
     go_ref NewTxClient(go_ref cfg_ref, char *signing_key_name, char **err);
-    go_ref TxClient_SignAndBroadcastAny(AsyncOperation* op, go_ref selfRef, char *msg_any_json);
-    go_ref TxClient_SignAndBroadcast(AsyncOperation* op, go_ref selfRef, char *msgTypeUrl, char *msg_bz, int msg_bz_len);
+    go_ref TxClient_SignAndBroadcast(AsyncOperation* op, go_ref self_ref, serialized_proto *msg);
+    go_ref TxClient_SignAndBroadcastMany(AsyncOperation* op, go_ref self_ref, proto_message_array *msgs);
 """)
 
 # Load the shared library.
