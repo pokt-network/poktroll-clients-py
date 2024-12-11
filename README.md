@@ -39,8 +39,11 @@ pipenv shell
 # (optional) Update protobufs ("pull" from buf.build)
 buf export buf.build/pokt-network/poktroll
 
-# Generate protobufs
-buf generate
+# (optional) Re-generate protobufs & fix imports
+buf generate && python ./scripts/fix_proto_imports.py
+
+# Install the package in editable mode
+pip install -e .
 
 # Run tests
 pytest
