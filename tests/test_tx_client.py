@@ -1,16 +1,20 @@
 from time import sleep
 
 import pytest
-from gen.cosmos.base.v1beta1.coin_pb2 import Coin
-from gen.poktroll.gateway.tx_pb2 import MsgStakeGateway, MsgUnstakeGateway
-from gen.poktroll.shared.service_pb2 import ApplicationServiceConfig
-from gen.poktroll.application.tx_pb2 import MsgStakeApplication, MsgUnstakeApplication, MsgDelegateToGateway
-from gen.cosmos.bank.v1beta1.tx_pb2 import MsgSend
-from src.block_client import BlockClient, BlockQueryClient
-from src.depinject import SupplyMany
-from src.events_query_client import EventsQueryClient
-from src.go_memory import go_ref
-from src.tx_client import TxContext, TxClient
+from poktroll_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
+from poktroll_clients.proto.poktroll.gateway.tx_pb2 import MsgStakeGateway, MsgUnstakeGateway
+from poktroll_clients.proto.poktroll.shared.service_pb2 import ApplicationServiceConfig
+from poktroll_clients.proto.poktroll.application.tx_pb2 import MsgStakeApplication, MsgUnstakeApplication, MsgDelegateToGateway
+from poktroll_clients.proto.cosmos.bank.v1beta1.tx_pb2 import MsgSend
+from poktroll_clients import (
+    BlockClient,
+    BlockQueryClient,
+    SupplyMany,
+    EventsQueryClient,
+    go_ref,
+    TxContext,
+    TxClient,
+)
 
 
 def test_tx_context():

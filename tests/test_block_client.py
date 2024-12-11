@@ -1,6 +1,9 @@
-from src.block_client import BlockQueryClient, BlockClient
-from src.depinject import SupplyMany
-from src.events_query_client import EventsQueryClient
+from poktroll_clients import (
+    BlockQueryClient,
+    BlockClient,
+    EventsQueryClient,
+    SupplyMany,
+)
 
 
 def test_block_query_client():

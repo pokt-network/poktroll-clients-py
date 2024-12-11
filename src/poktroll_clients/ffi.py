@@ -1,11 +1,7 @@
-# Add generated protobuf types to the module path.
-import sys
-sys.path.insert(0, "./gen")
-
 from os import path
 from typing import Callable
 
-from cffi import FFI, FFIError
+from cffi import FFI
 
 # Initialize CFFI
 ffi = FFI()
@@ -67,7 +63,7 @@ ffi.cdef("""
 
     go_ref Supply(go_ref go_ref, char **err);
     go_ref SupplyMany(go_ref *go_refs, int num_go_refs, char **err);
-    
+
     typedef struct {
         uint8_t* type_url;
         size_t type_url_length;

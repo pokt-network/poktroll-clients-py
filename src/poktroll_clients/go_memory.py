@@ -2,7 +2,7 @@ from typing import Callable
 
 from cffi import FFIError
 
-from src import ffi, libpoktroll_clients
+from poktroll_clients.ffi import ffi, libpoktroll_clients
 
 go_ref = int
 callback_type = Callable[[ffi.CData, ffi.CData], None]

@@ -1,5 +1,5 @@
-from src import ffi, libpoktroll_clients
-from src.go_memory import GoManagedMem, go_ref
+from poktroll_clients.ffi import ffi, libpoktroll_clients
+from poktroll_clients.go_memory import GoManagedMem, go_ref
 
 
 class EventsQueryClient(GoManagedMem):

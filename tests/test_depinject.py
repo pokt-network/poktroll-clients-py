@@ -1,6 +1,8 @@
-from src.block_client import BlockQueryClient
-from src.depinject import Supply
-from src.events_query_client import EventsQueryClient
+from poktroll_clients import (
+    BlockQueryClient,
+    Supply,
+    EventsQueryClient,
+)
 
 
 def test_depinject_supply():

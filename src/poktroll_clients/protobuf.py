@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from src import ffi
+from poktroll_clients.ffi import ffi
 
 
 @dataclass

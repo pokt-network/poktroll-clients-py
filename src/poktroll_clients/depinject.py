@@ -1,5 +1,5 @@
-from src import ffi, libpoktroll_clients
-from src.go_memory import go_ref, check_err, check_ref, GoManagedMem
+from poktroll_clients.ffi import ffi, libpoktroll_clients
+from poktroll_clients.go_memory import go_ref, check_err, check_ref, GoManagedMem
 
 
 def Supply(go_ref: go_ref) -> go_ref:

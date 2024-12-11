@@ -1,4 +1,4 @@
-from src.events_query_client import EventsQueryClient
+from poktroll_clients import EventsQueryClient
 
 
 def test_events_query_client():

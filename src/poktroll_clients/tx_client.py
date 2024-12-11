@@ -1,14 +1,14 @@
 import asyncio
-from typing import Union, Optional, Dict, Tuple, Callable, List
+from typing import Dict, Tuple
 
 from atomics import INTEGRAL, atomic, INT
 from google.protobuf.message import Message
 
-from cffi import FFI, FFIError
+from cffi import FFIError
 
-from src import ffi, libpoktroll_clients
-from src.go_memory import GoManagedMem, go_ref, check_err, check_ref
-from src.protobuf import SerializedProto, ProtoMessageArray
+from poktroll_clients.ffi import ffi, libpoktroll_clients
+from poktroll_clients.go_memory import GoManagedMem, go_ref, check_err, check_ref
+from poktroll_clients.protobuf import SerializedProto, ProtoMessageArray
 
 
 class TxClient(GoManagedMem):
