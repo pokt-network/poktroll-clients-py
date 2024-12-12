@@ -189,15 +189,6 @@ def get_packaged_library_path() -> Path:
     return lib_path
 
 
-def get_os_library_path(lib_name):
-    """
-    Get the full path to the OS-installed native library.
-    """
-
-    if find_library(lib_name):
-        return path.realpath(find_library(lib_name))  # Resolve any symlinks to get actual path
-
-
 lib_dir = path.join(path.dirname(path.abspath(__file__)), "lib")
 if platform == "darwin":
     lib_path_var = "DYLD_LIBRARY_PATH"
@@ -212,7 +203,7 @@ environ[lib_path_var] = f"{lib_dir}:{environ.get(lib_path_var, '')}"
 # print(f"lib_path_var: {lib_path_var}; lib_dir: {lib_dir}")
 # print(f"env: {environ[lib_path_var]}")
 
-lib_load_path = get_os_library_path('poktroll_clients')
+lib_load_path = find_library("poktroll_clients")
 if lib_load_path is None:
     lib_load_path = get_packaged_library_path()
 
