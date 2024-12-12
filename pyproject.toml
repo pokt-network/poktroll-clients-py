@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "cffi>=1.17.1"]
 build-backend = "hatchling.build"
 
 [project]
@@ -50,29 +50,11 @@ dev = [
 ]
 
 [tool.hatch.build]
+sources = ["src"]
 include = [
     "src/poktroll_clients/**/*.py",
     "src/poktroll_clients/**/*.pyi",
     "src/poktroll_clients/**/*.h",
     "src/poktroll_clients/**/*.pc.in",
-    "src/poktroll_clients/lib/*.so",
-    "src/poktroll_clients/lib/*.dylib",
-    "src/poktroll_clients/lib/*.dll"
+    "src/poktroll_clients/lib/*"
 ]
-
-[tool.hatch.build.overrides]
-"linux-*" = { include = ["src/poktroll_clients/**/*.py", "src/poktroll_clients/**/*.pyi", "src/poktroll_clients/**/*.h", "src/poktroll_clients/**/*.pc.in", "src/poktroll_clients/lib/*.so"] }
-"macos-*" = { include = ["src/poktroll_clients/**/*.py", "src/poktroll_clients/**/*.pyi", "src/poktroll_clients/**/*.h", "src/poktroll_clients/**/*.pc.in", "src/poktroll_clients/lib/*.dylib"] }
-"win-*" = { include = ["src/poktroll_clients/**/*.py", "src/poktroll_clients/**/*.pyi", "src/poktroll_clients/**/*.h", "src/poktroll_clients/**/*.pc.in", "src/poktroll_clients/lib/*.dll"] }
-
-[tool.hatch.build.targets.sdist]
-packages = ["src/poktroll_clients"]
-artifacts = [
-    "src/poktroll_clients/lib/*.so",
-    "src/poktroll_clients/lib/*.dylib",
-    "src/poktroll_clients/lib/*.dll"
-]
-#force-include = { "native_libs" = "src/poktroll_clients/lib" }
-
-#[tool.hatch.build.hooks.custom]
-#path = "build.py"
