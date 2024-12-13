@@ -1,6 +1,6 @@
 # `poktroll_clients` - Python Clients Library
 
-An [`asyncio`](https://docs.python.org/3/library/asyncio.html) based Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/github.com/pokt-network/poktroll@v0.0.10/pkg/client) (via [`libpoktroll_clients`](https://github.com/bryanchriswhite/libpoktroll-clients)).
+An [`asyncio`](https://docs.python.org/3/library/asyncio.html) based, cross-platform Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/github.com/pokt-network/poktroll@v0.0.10/pkg/client) (via [`libpoktroll_clients`](https://github.com/bryanchriswhite/libpoktroll-clients)).
 
 ## Table of Contents <!-- omit in toc -->
 
