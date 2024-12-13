@@ -7,10 +7,10 @@ An [`asyncio`](https://docs.python.org/3/library/asyncio.html) based, cross-plat
 - [Installation](#installation)
   - [PyPI (pip)](#pypi-pip)
   - [Source](#source)
-- [Getting started (development environment)](#getting-started-development-environment)
-  - [Start poktroll localnet](#start-poktroll-localnet)
-  - [Build and install `libpoktroll_clients` shared library & headers](#build-and-install-libpoktroll_clients-shared-library--headers)
-  - [Poktroll-clients-py development environment setup](#poktroll-clients-py-development-environment-setup)
+- [Getting started](#getting-started)
+  - [Start poktroll Localnet](#start-poktroll-localnet)
+  - [Usage Examples](#build-and-install-libpoktroll_clients-shared-library--headers)
+  - [Local Development Environment Setup](#local-development-environment-setup)
 
 ## Installation
 
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### Local development environment setup
+### Local Development Environment Setup
 ```bash
 git clone https://github.com/bryanchriswhite/poktroll-clients-py
 cd poktroll-clients-py
