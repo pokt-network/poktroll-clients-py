@@ -55,6 +55,10 @@ cd poktroll
 
 # Start poktroll localnet
 make localnet_up
+# Press "space" to open the Tilt web UI
+
+# After the validator service is running (in a separate terminal)
+make acc_initialize_pubkeys
 ```
 
 ### Usage Examples
