@@ -28,8 +28,8 @@ class BlockQueryClient(GoManagedMem):
     self_ref: go_ref
     err_ptr: ffi.CData
 
-    def __init__(self, comet_websocket_url: str):
-        go_ref = libpoktroll_clients.NewBlockQueryClient(comet_websocket_url.encode('utf-8'),
+    def __init__(self, query_node_rpc_url: str):
+        go_ref = libpoktroll_clients.NewBlockQueryClient(query_node_rpc_url.encode('utf-8'),
                                                          self.err_ptr)
 
         super().__init__(go_ref)

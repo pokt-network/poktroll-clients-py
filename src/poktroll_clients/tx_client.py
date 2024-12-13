@@ -127,11 +127,11 @@ class TxContext(GoManagedMem):
     go_ref: go_ref
     err_ptr: ffi.CData
 
-    def __init__(self, tcp_url: str):
+    def __init__(self, tx_node_rpc_url: str):
         """
         Constructor for TxContext.
-        :param tcp_url: The gRPC URL for the client to use (e.g. tcp://127.0.0.1:26657).
+        :param tx_node_rpc_url: The gRPC URL for the client to use (e.g. tcp://127.0.0.1:26657).
         """
 
-        go_ref = libpoktroll_clients.NewTxContext(tcp_url.encode('utf-8'), self.err_ptr)
+        go_ref = libpoktroll_clients.NewTxContext(tx_node_rpc_url.encode('utf-8'), self.err_ptr)
         super().__init__(go_ref)
