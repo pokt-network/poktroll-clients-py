@@ -1,23 +1,29 @@
-# `poktroll_clients` - Python Clients Library
+# `poktroll_clients` - Python Clients Library <!-- omit in toc -->
 
-An [`asyncio`](https://docs.python.org/3/library/asyncio.html) based, cross-platform Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/github.com/pokt-network/poktroll@v0.0.10/pkg/client) (via [`libpoktroll_clients`](https://github.com/bryanchriswhite/libpoktroll-clients)).
+An [`asyncio`](https://docs.python.org/3/library/asyncio.html) based, cross-platform
+Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/github.com/pokt-network/poktroll@v0.0.10/pkg/client)
+(via [`libpoktroll_clients`](https://github.com/pokt-network/libpoktroll-clients)).
 
 ## Table of Contents <!-- omit in toc -->
 
 - [Installation](#installation)
-  - [PyPI (pip)](#pypi-pip)
+  - [PyPI (`pip`)](#pypi-pip)
   - [Source](#source)
-- [Getting started](#getting-started)
-  - [Start poktroll Localnet](#start-poktroll-localnet)
-  - [Usage Examples](#build-and-install-libpoktroll_clients-shared-library--headers)
+    - [1. Clone the repository](#1-clone-the-repository)
+    - [2. Download \& install the release wheel](#2-download--install-the-release-wheel)
+    - [3. Download and unpack a release tarball](#3-download-and-unpack-a-release-tarball)
+- [Getting Started](#getting-started)
+  - [Start Poktroll Localnet](#start-poktroll-localnet)
+  - [Usage Examples](#usage-examples)
   - [Local Development Environment Setup](#local-development-environment-setup)
 
 ## Installation
 
 ### PyPI (`pip`)
 
-**NOTE:** Until some import optimizations are done, the shared libraries are too large to distribute via PyPI. 😢
-In the meantime, the shared libraries can be installed separately by following the [libpoktroll-clients README](https://github.com/bryanchriswhite/libpoktroll-clients/blob/main/README.md).
+> [!IMPORTANT]
+> Until some import optimizations are done, the shared libraries are too large to distribute via PyPI. 😢
+> In the meantime, the shared libraries can be installed separately by following the [libpoktroll-clients README](https://github.com/pokt-network/libpoktroll-clients/blob/main/README.md).
 
 ```bash
 pip install poktroll_clients
@@ -26,29 +32,50 @@ pip install poktroll_clients
 ### Source
 
 Download and install from source via **any one** of the following (e.g., for version `0.1.0a1`):
-1. Clone the repository and check out the desired release version tag.
-    ```bash
-    git clone https://github.com/bryanchriswhite/poktroll-clients-py
-    git checkout v0.1.0a1
-    ```
-2. Download and install a release wheel from the [releases page](https://github.com/bryanchriswhite/poktroll-clients-py/releases).
-    ```bash
-    wget https://github.com/bryanchriswhite/poktroll-clients-py/releases/download/poktrollv0.1.0a1/poktroll_clients-0.1.0a1-py3-none-any.whl
-    pip install ./poktroll_clients-0.1.0a1-py3-none-any.whl
-    # OR
-    pipenv install ./poktroll_clients-0.1.0a1-py3-none-any.whl
-    ```
-3. Download and unpack a release tarball from the [releases page](https://github.com/bryanchriswhite/poktroll-clients-py/releases).
-    ```bash
-    wget https://github.com/bryanchriswhite/poktroll-clients-py/releases/download/v0.1.0a1/poktroll_clients-0.1.0a1.tar.gz
-    pip install ./poktroll_clients-0.1.0a1.tar.gz
-    # OR
-    pipenv install ./poktroll_clients-0.1.0a1.tar.gz
-    ```
+
+#### 1. Clone the repository
+
+Clone the repository and check out the desired release version tag.
+
+```bash
+git clone https://github.com/pokt-network/poktroll-clients-py
+git checkout v0.1.0a1
+```
+
+#### 2. Download & install the release wheel
+
+Download and install a release wheel from the [releases page](https://github.com/pokt-network/poktroll-clients-py/releases).
+
+```bash
+wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.1.0a1/poktroll_clients-0.1.0a1-py3-none-any.whl
+pip install ./poktroll_clients-0.1.0a1-py3-none-any.whl
+```
+
+OR
+
+```bash
+pipenv install ./poktroll_clients-0.1.0a1-py3-none-any.whl
+```
+
+#### 3. Download and unpack a release tarball
+
+Download and unpack a release tarball from the [releases page](https://github.com/pokt-network/poktroll-clients-py/releases).
+
+```bash
+wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.1.0a1/poktroll_clients-0.1.0a1.tar.gz
+pip install ./poktroll_clients-0.1.0a1.tar.gz
+```
+
+OR
+
+```bash
+pipenv install ./poktroll_clients-0.1.0a1.tar.gz
+```
 
 ## Getting Started
 
 ### Start Poktroll Localnet
+
 ```bash
 git clone https://github.com/pokt-network/poktroll
 cd poktroll
@@ -130,7 +157,6 @@ example_tx_client = TxClient(tx_client_deps_ref, signing_key_name)
 
 </details>
 
-
 **Tx Client Usage**
 
 ```python
@@ -145,10 +171,10 @@ async def main():
     # build tx_client_deps_ref... see dependency construction example above.
 
     # Gateway 2 tx client (gateway2 SHOULD NOT be staked)
-    gw_tx_client = TxClient("gateway2", tx_client_deps_ref)
+    gw_tx_client = TxClient(tx_client_deps_ref, "gateway2")
 
     # Application 3 tx client (app3 SHOULD NOT be staked)
-    app_tx_client = TxClient("app3", tx_client_deps_ref)
+    app_tx_client = TxClient(tx_client_deps_ref, "app3")
 
     # Stake localnet gateway 2
     await gw_tx_client.sign_and_broadcast(
@@ -190,8 +216,9 @@ if __name__ == "__main__":
 ```
 
 ### Local Development Environment Setup
+
 ```bash
-git clone https://github.com/bryanchriswhite/poktroll-clients-py
+git clone https://github.com/pokt-network/poktroll-clients-py
 cd poktroll-clients-py
 
 # Install dependencies
