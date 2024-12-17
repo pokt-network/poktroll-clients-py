@@ -19,11 +19,11 @@ Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/githu
 
 ## Installation
 
-### PyPI (`pip`)
-
 > [!IMPORTANT]
 > Until some import optimizations are done, the shared libraries are too large to distribute via PyPI. 😢
-> In the meantime, the shared libraries can be installed separately by following the [libpoktroll-clients README](https://github.com/pokt-network/libpoktroll-clients/blob/main/README.md).
+> In the meantime, the shared libraries MUST be installed separately by following the [libpoktroll-clients README](https://github.com/pokt-network/libpoktroll-clients/blob/main/README.md).
+
+### PyPI (`pip`)
 
 ```bash
 pip install poktroll_clients
