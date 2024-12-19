@@ -78,6 +78,8 @@ ffi.cdef("""
         serialized_proto* messages;
         size_t num_messages;
     } proto_message_array;
+    
+    serialized_proto* GetGoProtoAsSerializedProto(go_ref go_proto_ref, char **err);
 
     go_ref NewEventsQueryClient(const char* comet_websocket_url);
     go_ref EventsQueryClientEventsBytes(go_ref selfRef, const char* query);
