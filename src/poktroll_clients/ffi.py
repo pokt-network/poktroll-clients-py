@@ -93,6 +93,47 @@ ffi.cdef("""
     go_ref NewTxClient(go_ref deps_ref, char *signing_key_name, char **err);
     go_ref TxClient_SignAndBroadcast(AsyncOperation* op, go_ref self_ref, serialized_proto *msg);
     go_ref TxClient_SignAndBroadcastMany(AsyncOperation* op, go_ref self_ref, proto_message_array *msgs);
+    
+    go_ref NewQueryClient(go_ref deps_ref, char *query_node_rpc_url, char **err);
+    
+    // Params query methods (all modules)
+    // TODO_BLOCKED(@bryanchriswhite, poktroll#934): add commented methods once
+    // Go method dependencies are available.
+    go_ref QueryClient_GetSharedParams(go_ref self_ref, char **err);
+    // go_ref QueryClient_GetApplicationParams(go_ref self_ref, char** err);
+    // go_ref QueryClient_GetGatewayParams(go_ref self_ref, char** err);
+    // go_ref QueryClient_GetSupplierParams(go_ref self_ref, char** err);
+    go_ref QueryClient_GetSessionParams(go_ref self_ref, char** err);
+    // go_ref QueryClient_GetServiceParams(go_ref self_ref, char** err);
+    go_ref QueryClient_GetProofParams(go_ref self_ref, char** err);
+    // go_ref QueryClient_GetTokenomicsParams(go_ref self_ref, char** err);    
+    
+    // Application module query methods
+    go_ref QueryClient_GetApplication(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllApplications(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Gateway module query methods
+    go_ref QueryClient_GetGateway(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllGateways(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Supplier module query methods
+    go_ref QueryClient_GetSupplier(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllSuppliers(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Session module query methods
+    go_ref QueryClient_GetSession(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Service module query methods
+    go_ref QueryClient_GetService(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllServices(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetRelayMiningDifficulty(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllRelayMiningDifficulties(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Proof module query methods
+    go_ref QueryClient_GetClaim(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllClaims(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetProof(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllProofs(AsyncOperation* op, go_ref self_ref, char *address);
 """)
 
 

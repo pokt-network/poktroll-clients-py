@@ -19,8 +19,9 @@ def check_err(err_ptr: ffi.CData) -> None:
 
 
 def check_ref(go_ref: go_ref) -> None:
-    if go_ref < 1:
-        raise FFIError("unexpected emtpy go_ref")
+    # TODO_NEXT_LIBPOKTROLL_CLIENT_VERSION: this should be 0.
+    if go_ref < 0:
+        raise FFIError("unexpected empty go_ref")
 
 
 class GoManagedMem:
