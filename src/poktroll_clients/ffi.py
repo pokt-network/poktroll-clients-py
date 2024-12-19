@@ -106,7 +106,34 @@ ffi.cdef("""
     go_ref QueryClient_GetSessionParams(go_ref self_ref, char** err);
     // go_ref QueryClient_GetServiceParams(go_ref self_ref, char** err);
     go_ref QueryClient_GetProofParams(go_ref self_ref, char** err);
-    // go_ref QueryClient_GetTokenomicsParams(go_ref self_ref, char** err);
+    // go_ref QueryClient_GetTokenomicsParams(go_ref self_ref, char** err);    
+    
+    // Application module query methods
+    go_ref QueryClient_GetApplication(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllApplications(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Gateway module query methods
+    go_ref QueryClient_GetGateway(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllGateways(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Supplier module query methods
+    go_ref QueryClient_GetSupplier(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllSuppliers(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Session module query methods
+    go_ref QueryClient_GetSession(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Service module query methods
+    go_ref QueryClient_GetService(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllServices(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetRelayMiningDifficulty(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllRelayMiningDifficulties(AsyncOperation* op, go_ref self_ref, char *address);
+    
+    // Proof module query methods
+    go_ref QueryClient_GetClaim(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllClaims(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetProof(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetAllProofs(AsyncOperation* op, go_ref self_ref, char *address);
 """)
 
 
