@@ -35,6 +35,42 @@ class QueryClient(GoManagedMem):
 
         return get_proto_from_go_ref(params_ref)
 
+    def get_session_grace_period_end_height(self, query_height: int) -> int:
+        session_grace_period_end_height = libpoktroll_clients.QueryClient_GetSessionGracePeriodEndHeight(self.go_ref, query_height, self.err_ptr)
+        check_err(self.err_ptr)
+
+        return session_grace_period_end_height
+
+    def get_claim_window_open_height(self, query_height: int) -> int:
+        claim_window_open_height = libpoktroll_clients.QueryClient_GetClaimWindowOpenHeight(self.go_ref, query_height, self.err_ptr)
+        check_err(self.err_ptr)
+
+        return claim_window_open_height
+
+    def get_earliest_supplier_claim_commit_height(self, query_height: int, supplier_operator_address: str) -> int:
+        earliest_supplier_claim_commit_height = libpoktroll_clients.QueryClient_GetEarliestSupplierClaimCommitHeight(self.go_ref, query_height, supplier_operator_address.encode('utf-8'), self.err_ptr)
+        check_err(self.err_ptr)
+
+        return earliest_supplier_claim_commit_height
+
+    def get_proof_window_open_height(self, query_height: int) -> int:
+        proof_window_open_height = libpoktroll_clients.QueryClient_GetProofWindowOpenHeight(self.go_ref, query_height, self.err_ptr)
+        check_err(self.err_ptr)
+
+        return proof_window_open_height
+
+    def get_earliest_supplier_proof_commit_height(self, query_height: int, supplier_operator_address: str) -> int:
+        earliest_supplier_proof_commit_height = libpoktroll_clients.QueryClient_GetEarliestSupplierProofCommitHeight(self.go_ref, query_height, supplier_operator_address.encode('utf-8'), self.err_ptr)
+        check_err(self.err_ptr)
+
+        return earliest_supplier_proof_commit_height
+
+    def get_compute_units_to_tokens_multiplier(self) -> int:
+        compute_units_to_tokens_multiplier = libpoktroll_clients.QueryClient_GetComputeUnitsToTokensMultiplier(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+
+        return compute_units_to_tokens_multiplier
+
     def get_application_params(self) -> ApplicationParams:
         params_ref = libpoktroll_clients.QueryClient_GetApplicationParams(self.go_ref, self.err_ptr)
         check_err(self.err_ptr)

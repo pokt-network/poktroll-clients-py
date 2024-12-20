@@ -97,7 +97,7 @@ ffi.cdef("""
     go_ref NewQueryClient(go_ref deps_ref, char *query_node_rpc_url, char **err);
     
     // Params query methods (all modules)
-    // TODO_BLOCKED(@bryanchriswhite, poktroll#934): add commented methods once
+    // TODO_BLOCKED(@bryanchriswhite, poktroll#543): add commented methods once
     // Go method dependencies are available.
     go_ref QueryClient_GetSharedParams(go_ref self_ref, char **err);
     // go_ref QueryClient_GetApplicationParams(go_ref self_ref, char** err);
@@ -108,13 +108,21 @@ ffi.cdef("""
     go_ref QueryClient_GetProofParams(go_ref self_ref, char** err);
     // go_ref QueryClient_GetTokenomicsParams(go_ref self_ref, char** err);    
     
+    // Shared module query methods
+    int64_t QueryClient_GetSessionGracePeriodEndHeight(go_ref self_ref, int64_t query_height, char** err);
+    int64_t QueryClient_GetClaimWindowOpenHeight(go_ref self_ref, int64_t query_height, char** err);
+    int64_t QueryClient_GetEarliestSupplierClaimCommitHeight(go_ref self_ref, int64_t query_height, char* supplier_operator_address, char** err);
+    int64_t QueryClient_GetProofWindowOpenHeight(go_ref self_ref, int64_t query_height, char** err);
+    int64_t QueryClient_GetEarliestSupplierProofCommitHeight(go_ref self_ref, int64_t query_height, char* supplier_operator_address, char** err);
+    uint64_t QueryClient_GetComputeUnitsToTokensMultiplier(go_ref self_ref, char **err);
+    
     // Application module query methods
-    go_ref QueryClient_GetApplication(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllApplications(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetApplication(go_ref self_ref, char *address, char **err);
+    go_ref QueryClient_GetAllApplications(go_ref self_ref, char *address, char **err);
     
     // Gateway module query methods
-    go_ref QueryClient_GetGateway(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllGateways(AsyncOperation* op, go_ref self_ref, char *address);
+    go_ref QueryClient_GetGateway(go_ref self_ref, char *address, char **err);
+    go_ref QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
     
     // Supplier module query methods
     go_ref QueryClient_GetSupplier(AsyncOperation* op, go_ref self_ref, char *address);
