@@ -16,6 +16,12 @@ pytest = "*"
 pytest-cov = "*"
 hatch = "*"
 twine = "*"
+invoke = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
+mkdocs = "*"
+mkdocstrings = "*"
+napoleon = "*"
 
 [requires]
 python_version = "3.11"
