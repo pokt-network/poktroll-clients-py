@@ -1,9 +1,10 @@
 from poktroll_clients.proto.poktroll.shared.params_pb2 import Params as SharedParams
+from poktroll_clients.proto.poktroll.session.params_pb2 import Params as SessionParams
 from poktroll_clients.query_client import QueryClient
 
 
 # @pytest.mark.asyncio
-def test_query_client():
+def test_query_shared_params():
     query_client = QueryClient("http://127.0.0.1:26657")
 
     # TODO_CONSIDERATION: async API for query methods.
@@ -22,3 +23,14 @@ def test_query_client():
     )
 
     assert shared_params == expected_shared_params
+
+def test_query_session_params():
+    query_client = QueryClient("http://127.0.0.1:26657")
+
+    session_params = query_client.get_session_params()
+
+    expected_session_params = SessionParams(
+        num_suppliers_per_session=99,
+    )
+
+    assert session_params == expected_session_params
