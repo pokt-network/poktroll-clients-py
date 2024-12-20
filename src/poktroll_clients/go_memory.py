@@ -10,7 +10,7 @@ callback_type = Callable[[ffi.CData, ffi.CData], None]
 
 # TODO_IN_THIS_COMMIT: switch to an err_msg[] array
 
-def check_err(err_ptr: ffi.CData):
+def check_err(err_ptr: ffi.CData) -> None:
     """
     TODO_IN_THIS_COMMIT: comment...
     """
@@ -18,9 +18,10 @@ def check_err(err_ptr: ffi.CData):
         raise FFIError(ffi.string(err_ptr[0]))
 
 
-def check_ref(go_ref: go_ref):
+def check_ref(go_ref: go_ref) -> None:
+    # TODO_NEXT_LIBPOKTROLL_CLIENT_VERSION: this should be 0.
     if go_ref < 1:
-        raise FFIError("unexpected emtpy go_ref")
+        raise FFIError("unexpected empty go_ref")
 
 
 class GoManagedMem:
