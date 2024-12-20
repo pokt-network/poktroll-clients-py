@@ -1,23 +1,13 @@
-import asyncio
-from typing import Tuple, Dict
-
-from atomics import INTEGRAL, atomic, INT
-from cffi import FFIError
-
 from poktroll_clients import (
     go_ref,
     ffi,
     libpoktroll_clients,
     GoManagedMem, BlockQueryClient, Supply, check_err, check_ref,
 )
-from poktroll_clients.proto.poktroll.shared.params_pb2 import Params as SharedParams
-from poktroll_clients.proto.poktroll.application.params_pb2 import Params as ApplicationParams
-from poktroll_clients.proto.poktroll.gateway.params_pb2 import Params as GatewayParams
-from poktroll_clients.proto.poktroll.supplier.params_pb2 import Params as SupplierParams
 from poktroll_clients.proto.poktroll.session.params_pb2 import Params as SessionParams
-from poktroll_clients.proto.poktroll.service.params_pb2 import Params as ServiceParams
+from poktroll_clients.proto.poktroll.shared.params_pb2 import Params as SharedParams
 from poktroll_clients.proto.poktroll.proof.params_pb2 import Params as ProofParams
-from poktroll_clients.proto.poktroll.tokenomics.params_pb2 import Params as TokenomicsParams
+from poktroll_clients.proto.poktroll.application.params_pb2 import Params as ApplicationParams
 from poktroll_clients.protobuf import get_proto_from_go_ref
 
 
@@ -54,33 +44,50 @@ class QueryClient(GoManagedMem):
     #
     #     return await future
 
-    def get_shared_params(self) -> asyncio.Future[SharedParams]:
-        response_ref = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref, self.err_ptr)
+    def get_shared_params(self) -> SharedParams:
+        params_ref = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref, self.err_ptr)
         check_err(self.err_ptr)
-        check_ref(response_ref)
+        check_ref(params_ref)
 
-        return get_proto_from_go_ref(response_ref)
+        return get_proto_from_go_ref(params_ref)
 
     def get_application_params(self) -> ApplicationParams:
-        response_ref = libpoktroll_clients.QueryClient_GetApplicationParams(self.go_ref, self.err_ptr)
+        params_ref = libpoktroll_clients.QueryClient_GetApplicationParams(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+        check_ref(params_ref)
 
-    def get_supplier_params(self) -> SupplierParams:
-        response_ref = libpoktroll_clients.QueryClient_GetSupplierParams(self.go_ref, self.err_ptr)
+        return get_proto_from_go_ref(params_ref)
 
-    def get_gateway_params(self) -> GatewayParams:
-        response_ref = libpoktroll_clients.QueryClient_GetGatewayParams(self.go_ref, self.err_ptr)
+    # TODO_BLOCKED(@bryanchriswhite, poktroll#934): add commented methods once
+    # Go method dependencies are available.
+
+    # def get_supplier_params(self) -> SupplierParams:
+    #     response_ref = libpoktroll_clients.QueryClient_GetSupplierParams(self.go_ref, self.err_ptr)
+
+    # def get_gateway_params(self) -> GatewayParams:
+    #     response_ref = libpoktroll_clients.QueryClient_GetGatewayParams(self.go_ref, self.err_ptr)
 
     def get_session_params(self) -> SessionParams:
-        response_ref = libpoktroll_clients.QueryClient_GetSessionParams(self.go_ref, self.err_ptr)
+        params_ref = libpoktroll_clients.QueryClient_GetSessionParams(self.go_ref, self.err_ptr)
 
-    def get_service_params(self) -> ServiceParams:
-        response_ref = libpoktroll_clients.QueryClient_GetServiceParams(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+        check_ref(params_ref)
+
+        return get_proto_from_go_ref(params_ref)
+
+    # def get_service_params(self) -> ServiceParams:
+    #     response_ref = libpoktroll_clients.QueryClient_GetServiceParams(self.go_ref, self.err_ptr)
 
     def get_proof_params(self) -> ProofParams:
-        response_ref = libpoktroll_clients.QueryClient_GetProofParams(self.go_ref, self.err_ptr)
+        params_ref = libpoktroll_clients.QueryClient_GetProofParams(self.go_ref, self.err_ptr)
 
-    def get_tokenomics_params(self) -> TokenomicsParams:
-        response_ref = libpoktroll_clients.QueryClient_GetTokenomicsParams(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+        check_ref(params_ref)
+
+        return get_proto_from_go_ref(params_ref)
+
+    # def get_tokenomics_params(self) -> TokenomicsParams:
+    #     response_ref = libpoktroll_clients.QueryClient_GetTokenomicsParams(self.go_ref, self.err_ptr)
 
     # TODO_CONSIDERATION: support an async API as well?
 
