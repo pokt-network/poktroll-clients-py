@@ -85,6 +85,7 @@ ffi.cdef("""
     go_ref EventsQueryClientEventsBytes(go_ref selfRef, const char* query);
 
     go_ref NewBlockQueryClient(char *comet_websocket_url, char **err);
+    go_ref BlockQueryClient_Block(go_ref self_ref, int64_t* query_height, char **err);
 
     go_ref NewTxContext(char *tcp_url, char **err);
 
