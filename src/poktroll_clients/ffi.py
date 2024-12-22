@@ -100,14 +100,14 @@ ffi.cdef("""
     // Params query methods (all modules)
     // TODO_BLOCKED(@bryanchriswhite, poktroll#543): add commented methods once
     // Go method dependencies are available.
-    go_ref QueryClient_GetSharedParams(go_ref self_ref, char **err);
-    // go_ref QueryClient_GetApplicationParams(go_ref self_ref, char** err);
-    // go_ref QueryClient_GetGatewayParams(go_ref self_ref, char** err);
-    // go_ref QueryClient_GetSupplierParams(go_ref self_ref, char** err);
-    go_ref QueryClient_GetSessionParams(go_ref self_ref, char** err);
-    // go_ref QueryClient_GetServiceParams(go_ref self_ref, char** err);
-    go_ref QueryClient_GetProofParams(go_ref self_ref, char** err);
-    // go_ref QueryClient_GetTokenomicsParams(go_ref self_ref, char** err);    
+    serialized_proto* QueryClient_GetSharedParams(go_ref self_ref, char **err);
+    // serialized_proto* QueryClient_GetApplicationParams(go_ref self_ref, char** err);
+    // serialized_proto* QueryClient_GetGatewayParams(go_ref self_ref, char** err);
+    // serialized_proto* QueryClient_GetSupplierParams(go_ref self_ref, char** err);
+    serialized_proto* QueryClient_GetSessionParams(go_ref self_ref, char** err);
+    // serialized_proto* QueryClient_GetServiceParams(go_ref self_ref, char** err);
+    serialized_proto* QueryClient_GetProofParams(go_ref self_ref, char** err);
+    // serialized_proto* QueryClient_GetTokenomicsParams(go_ref self_ref, char** err);    
     
     // Shared module query methods
     int64_t QueryClient_GetSessionGracePeriodEndHeight(go_ref self_ref, int64_t query_height, char** err);
@@ -118,31 +118,30 @@ ffi.cdef("""
     uint64_t QueryClient_GetComputeUnitsToTokensMultiplier(go_ref self_ref, char **err);
     
     // Application module query methods
-    go_ref QueryClient_GetApplication(go_ref self_ref, char *address, char **err);
-    go_ref QueryClient_GetAllApplications(go_ref self_ref, char *address, char **err);
+    serialized_proto* QueryClient_GetApplication(go_ref self_ref, char *address, char **err);
+    proto_message_array* QueryClient_GetAllApplications(go_ref self_ref, char **err);
     
     // Gateway module query methods
-    go_ref QueryClient_GetGateway(go_ref self_ref, char *address, char **err);
-    go_ref QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
+    serialized_proto* QueryClient_GetGateway(go_ref self_ref, char *address, char **err);
+    serialized_proto* QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
     
     // Supplier module query methods
-    go_ref QueryClient_GetSupplier(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllSuppliers(AsyncOperation* op, go_ref self_ref, char *address);
+    serialized_proto* QueryClient_GetSupplier(AsyncOperation* op, go_ref self_ref, char *address);
+    serialized_proto* QueryClient_GetAllSuppliers(AsyncOperation* op, go_ref self_ref, char *address);
     
     // Session module query methods
-    go_ref QueryClient_GetSession(AsyncOperation* op, go_ref self_ref, char *address);
+    serialized_proto* QueryClient_GetSession(go_ref self_ref, char* app_address, char* service_id, int64_t block_height, char **err);
     
     // Service module query methods
-    go_ref QueryClient_GetService(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllServices(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetRelayMiningDifficulty(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllRelayMiningDifficulties(AsyncOperation* op, go_ref self_ref, char *address);
+    serialized_proto* QueryClient_GetService(go_ref self_ref, char* service_id, char **err);
+    serialized_proto* QueryClient_GetServiceRelayDifficulty(go_ref self_ref, char* service_id, char **err);
     
+    // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Proof module query methods
-    go_ref QueryClient_GetClaim(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllClaims(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetProof(AsyncOperation* op, go_ref self_ref, char *address);
-    go_ref QueryClient_GetAllProofs(AsyncOperation* op, go_ref self_ref, char *address);
+    // serialized_proto* QueryClient_GetClaim(go_ref self_ref, char *address);
+    // serialized_proto* QueryClient_GetAllClaims(go_ref self_ref, char *address);
+    // serialized_proto* QueryClient_GetProof(go_ref self_ref, char *address);
+    // serialized_proto* QueryClient_GetAllProofs(go_ref self_ref, char *address);
 """)
 
 

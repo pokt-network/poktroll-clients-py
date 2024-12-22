@@ -1,5 +1,6 @@
 import importlib
 from dataclasses import dataclass
+from pprint import pprint
 from typing import List
 
 from google.protobuf import symbol_database, message
@@ -61,6 +62,15 @@ class ProtoMessageArray:
     """
     messages: List[SerializedProto]
 
+    @staticmethod
+    def from_c_struct(c_proto_message_array: ffi.CData):
+        proto_message_array = ProtoMessageArray(messages=[])
+        for i in range(c_proto_message_array.num_messages):
+            serialized_proto = SerializedProto.from_c_struct(c_proto_message_array.messages[i])
+            proto_message_array.messages.append(serialized_proto)
+
+        return proto_message_array
+
     def to_c_struct(self) -> ffi.CData:
         """
         Converts the Python protobuf message array to a C struct while preserving the underlying memory.
@@ -109,34 +119,43 @@ def get_serialized_proto(go_proto_ref: go_ref) -> SerializedProto:
 
     check_err(err_ptr)
 
-    return SerializedProto.from_c_struct(c_serialized_proto)
+    # TODO_IN_THIS_COMMIT: Free the C struct
+    # NB: Caller is responsible for freeing the returned C struct.
+    serialized_proto = SerializedProto.from_c_struct(c_serialized_proto)
+    # ffi.free(c_serialized_proto)
+
+    return serialized_proto
 
 
-def deserialize_protobuf(serialized_data: bytes, type_url: str) -> message.Message:
+def deserialize_protobuf(serialized_proto: SerializedProto) -> message.Message:
     """
     Deserialize protocol buffer data given a type URL.
 
     Args:
-        serialized_data: Bytes containing the serialized protobuf message
-        type_url: Type URL in format "type.googleapis.com/package.MessageType"
-                 or "package.MessageType"
+        serialized_proto: SerializedProto object containing the serialized protobuf message.
     Returns:
-        dict: Deserialized protobuf message as a dictionary
-
+        Deserialized protobuf message as its concrete type.
     Raises:
         ValueError: If type URL is invalid or message type cannot be found
         ImportError: If the protobuf module cannot be imported
     """
+
+    # First, import the module containing the protobuf classes
+    # This ensures the types are registered in the symbol database
+    type_url = serialized_proto.type_url.lstrip("/")
+    poktroll_namespace = type_url.rsplit(".", 1)[0]
+    package_filename = f"{type_url.rsplit('.', 1)[1].lower()}_pb2"
+    package_module = f"poktroll_clients.proto.{poktroll_namespace}.{package_filename}"
+
     try:
-        # First, import the module containing the protobuf classes
-        # This ensures the types are registered in the symbol database
-        type_url = type_url.lstrip("/")
-        poktroll_namespace = type_url.rsplit(".", 1)[0]
-        package_filename = f"{type_url.rsplit('.', 1)[1].lower()}_pb2"
-        package_module = f"poktroll_clients.proto.{poktroll_namespace}.{package_filename}"
         importlib.import_module(package_module)
     except ImportError as e:
-        raise ImportError(f"Could not import protobuf module {package_module}: {str(e)}")
+        try:
+            # NB: Fallback to importing the types_pb2 module if the main module fails
+            package_module = f"poktroll_clients.proto.{poktroll_namespace}.types_pb2"
+            importlib.import_module(package_module)
+        except ImportError as e:
+            raise ImportError(f"Could not import protobuf module {package_module}: {str(e)}")
 
     # Extract the full message type from the type URL
     if '/' in type_url:
@@ -156,7 +175,7 @@ def deserialize_protobuf(serialized_data: bytes, type_url: str) -> message.Messa
 
         # Create a new message instance and parse the data
         message = message_class()
-        message.ParseFromString(serialized_data)
+        message.ParseFromString(serialized_proto.data)
 
         return message
         # # Convert to dictionary for easier handling
@@ -185,4 +204,4 @@ def get_proto_from_go_ref(go_proto_ref: go_ref) -> message.Message:
         ImportError: If the protobuf module cannot be imported
     """
     serialized_proto = get_serialized_proto(go_proto_ref)
-    return deserialize_protobuf(serialized_proto.data, serialized_proto.type_url)
+    return deserialize_protobuf(serialized_proto)

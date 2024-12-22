@@ -156,10 +156,7 @@ def _new_tx_client_depinject_config(
     if not tx_node_rpc_url:
         raise ValueError("tx_node_rpc_url must be specified")
 
-    query_node_ws_url = urlparse(query_node_rpc_url)
-    query_node_ws_url.scheme = "ws"
-    query_node_ws_url.path = "websocket"
-
+    query_node_ws_url = urlparse(query_node_rpc_url)._replace(scheme="ws", path="websocket")
     events_query_client = EventsQueryClient(query_node_ws_url.geturl())
     block_query_client = BlockQueryClient(query_node_rpc_url)
 
