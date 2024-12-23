@@ -121,13 +121,15 @@ ffi.cdef("""
     serialized_proto* QueryClient_GetApplication(go_ref self_ref, char *address, char **err);
     proto_message_array* QueryClient_GetAllApplications(go_ref self_ref, char **err);
     
+    // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Gateway module query methods
-    serialized_proto* QueryClient_GetGateway(go_ref self_ref, char *address, char **err);
-    serialized_proto* QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
+    // serialized_proto* QueryClient_GetGateway(go_ref self_ref, char *address, char **err);
+    // proto_message_array* QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
     
+    // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Supplier module query methods
-    serialized_proto* QueryClient_GetSupplier(AsyncOperation* op, go_ref self_ref, char *address);
-    serialized_proto* QueryClient_GetAllSuppliers(AsyncOperation* op, go_ref self_ref, char *address);
+    serialized_proto* QueryClient_GetSupplier(go_ref self_ref, char *address, char **err);
+    // proto_message_array* QueryClient_GetAllSuppliers(go_ref self_ref, char *address);
     
     // Session module query methods
     serialized_proto* QueryClient_GetSession(go_ref self_ref, char* app_address, char* service_id, int64_t block_height, char **err);
@@ -139,9 +141,9 @@ ffi.cdef("""
     // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Proof module query methods
     // serialized_proto* QueryClient_GetClaim(go_ref self_ref, char *address);
-    // serialized_proto* QueryClient_GetAllClaims(go_ref self_ref, char *address);
+    // proto_message_array* QueryClient_GetAllClaims(go_ref self_ref, char *address);
     // serialized_proto* QueryClient_GetProof(go_ref self_ref, char *address);
-    // serialized_proto* QueryClient_GetAllProofs(go_ref self_ref, char *address);
+    // proto_message_array* QueryClient_GetAllProofs(go_ref self_ref, char *address);
 """)
 
 

@@ -41,6 +41,7 @@ class GoManagedMem:
         """
 
         self.go_ref = go_ref
+        self.err_ptr = ffi.new("char **")
 
         check_err(self.err_ptr)
         check_ref(go_ref)

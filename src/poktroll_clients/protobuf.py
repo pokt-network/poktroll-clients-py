@@ -6,6 +6,7 @@ from typing import List
 from google.protobuf import symbol_database, message
 
 from poktroll_clients import go_ref, libpoktroll_clients, check_err
+from poktroll_clients.cases import camel_to_snake_case
 from poktroll_clients.ffi import ffi
 
 
@@ -144,7 +145,8 @@ def deserialize_protobuf(serialized_proto: SerializedProto) -> message.Message:
     # This ensures the types are registered in the symbol database
     type_url = serialized_proto.type_url.lstrip("/")
     poktroll_namespace = type_url.rsplit(".", 1)[0]
-    package_filename = f"{type_url.rsplit('.', 1)[1].lower()}_pb2"
+    filename_prefix = camel_to_snake_case(type_url.rsplit('.', 1)[1])
+    package_filename = f"{filename_prefix}_pb2"
     package_module = f"poktroll_clients.proto.{poktroll_namespace}.{package_filename}"
 
     try:

@@ -11,6 +11,7 @@ from poktroll_clients.proto.poktroll.session.types_pb2 import Session
 from poktroll_clients.proto.poktroll.shared.params_pb2 import Params as SharedParams
 from poktroll_clients.proto.poktroll.proof.params_pb2 import Params as ProofParams
 from poktroll_clients.proto.poktroll.application.params_pb2 import Params as ApplicationParams
+from poktroll_clients.proto.poktroll.shared.service_pb2 import Service
 from poktroll_clients.proto.poktroll.shared.supplier_pb2 import Supplier
 from poktroll_clients.protobuf import get_proto_from_go_ref, SerializedProto, deserialize_protobuf, ProtoMessageArray
 
@@ -33,7 +34,8 @@ class QueryClient(GoManagedMem):
         super().__init__(self_ref)
 
     def get_shared_params(self) -> SharedParams:
-        c_serialized_params: SerializedProto = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref, self.err_ptr)
+        c_serialized_params: SerializedProto = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref,
+                                                                                               self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -124,7 +126,8 @@ class QueryClient(GoManagedMem):
     #     response_ref = libpoktroll_clients.QueryClient_GetTokenomicsParams(self.go_ref, self.err_ptr)
 
     def get_application(self, app_address: str) -> Application:
-        c_serialized_app = libpoktroll_clients.QueryClient_GetApplication(self.go_ref, app_address.encode('utf-8'), self.err_ptr)
+        c_serialized_app = libpoktroll_clients.QueryClient_GetApplication(
+            self.go_ref, app_address.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -139,27 +142,67 @@ class QueryClient(GoManagedMem):
         proto_message_array = ProtoMessageArray.from_c_struct(c_proto_message_array)
         return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
 
-
-
-    def get_gateway(self, gateway_address: str) -> Gateway:
-        pass
-
-    def get_all_gateways(self) -> list[Gateway]:
-        pass
+    # def get_gateway(self, gateway_address: str) -> Gateway:
+    #     c_serialized_gateway = libpoktroll_clients.QueryClient_GetGateway(
+    #         self.go_ref, gateway_address.encode('utf-8'), self.err_ptr)
+    #     # TODO_IN_THIS_COMMIT: free the C struct and its members
+    #     check_err(self.err_ptr)
+    #
+    #     serialized_gateway = SerializedProto.from_c_struct(c_serialized_gateway)
+    #     return deserialize_protobuf(serialized_gateway)
+    #
+    # def get_all_gateways(self) -> list[Gateway]:
+    #     c_proto_message_array = libpoktroll_clients.QueryClient_GetAllGateways(self.go_ref, self.err_ptr)
+    #     # TODO_IN_THIS_COMMIT: free the C struct and its members
+    #     check_err(self.err_ptr)
+    #
+    #     proto_message_array = ProtoMessageArray.from_c_struct(c_proto_message_array)
+    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
 
     def get_supplier(self, supplier_operator_address: str) -> Supplier:
-        pass
+        c_serialized_supplier = libpoktroll_clients.QueryClient_GetSupplier(
+            self.go_ref, supplier_operator_address.encode('utf-8'), self.err_ptr)
+        # TODO_IN_THIS_COMMIT: free the C struct and its members
+        check_err(self.err_ptr)
 
-    def get_all_suppliers(self) -> list[Supplier]:
-        pass
+        serialized_supplier = SerializedProto.from_c_struct(c_serialized_supplier)
+        return deserialize_protobuf(serialized_supplier)
+
+    # def get_all_suppliers(self) -> list[Supplier]:
+    #     c_proto_message_array = libpoktroll_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
+    #     # TODO_IN_THIS_COMMIT: free the C struct and its members
+    #     check_err(self.err_ptr)
+    #
+    #     proto_message_array = ProtoMessageArray.from_c_struct(c_proto_message_array)
+    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
 
     def get_session(self, app_address: str, service_id: str, block_height: int) -> Session:
-        pass
+        c_serialized_session = libpoktroll_clients.QueryClient_GetSession(
+            self.go_ref, app_address.encode('utf-8'), service_id.encode('utf-8'), block_height, self.err_ptr)
+        # TODO_IN_THIS_COMMIT: free the C struct and its members
+        check_err(self.err_ptr)
+
+        serialized_session = SerializedProto.from_c_struct(c_serialized_session)
+        return deserialize_protobuf(serialized_session)
+
+    def get_service(self, service_id: str) -> Service:
+        c_serialized_service = libpoktroll_clients.QueryClient_GetService(
+            self.go_ref, service_id.encode('utf-8'), self.err_ptr)
+        # TODO_IN_THIS_COMMIT: free the C struct and its members
+        check_err(self.err_ptr)
+
+        serialized_service = SerializedProto.from_c_struct(c_serialized_service)
+        return deserialize_protobuf(serialized_service)
 
     def get_service_relay_difficulty(self, service_id: str) -> int:
-        pass
+        c_service_relay_difficulty = libpoktroll_clients.QueryClient_GetServiceRelayDifficulty(
+            self.go_ref, service_id.encode('utf-8'), self.err_ptr)
+        # TODO_IN_THIS_COMMIT: free the C struct and its members
+        check_err(self.err_ptr)
 
 
+        serialized_service_relay_difficulty = SerializedProto.from_c_struct(c_service_relay_difficulty)
+        return deserialize_protobuf(serialized_service_relay_difficulty)
 
 
 def _new_query_client_depinject_config(
