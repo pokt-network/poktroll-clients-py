@@ -16,6 +16,7 @@ pytest = "*"
 pytest-cov = "*"
 hatch = "*"
 twine = "*"
+typing-extensions = "*"
 
 [requires]
 python_version = "3.11"
