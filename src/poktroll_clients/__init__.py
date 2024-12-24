@@ -5,6 +5,7 @@ from .go_memory import ffi, libpoktroll_clients, go_ref, check_err, check_ref, G
 from .depinject import Supply, SupplyMany
 from .events_query_client import EventsQueryClient
 from .block_client import BlockClient, BlockQueryClient
+from .query_client import QueryClient
 from .tx_context import TxContext
 from .tx_client import TxClient
 
@@ -13,6 +14,7 @@ __all__ = [
     'BlockQueryClient',
     'TxContext',
     'TxClient',
+    'QueryClient',
     'EventsQueryClient',
     'Supply',
     'SupplyMany',
