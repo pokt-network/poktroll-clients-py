@@ -36,6 +36,7 @@ class QueryClient(GoManagedMem):
     def get_shared_params(self) -> SharedParams:
         c_serialized_params: SerializedProto = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref,
                                                                                                self.err_ptr)
+        # Came across lots of these.
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 

@@ -5,29 +5,29 @@
 1. cpack macos installer
 2. cpack windows installer
 3. release libpoktroll_clients
-    - github
-        - tag
-        - installers
-        - shared libs
+   - github
+     - tag
+     - installers
+     - shared libs
 4. release poktroll-clients-py
-    - github
-        - tag
-        - tgzs
-        - wheels
-        - notes: reference README.md section re: installing shared libs
-    - pypi
-        - tgzs
-        - wheels
+   - github
+     - tag
+     - tgzs
+     - wheels
+     - notes: reference README.md section re: installing shared libs
+   - pypi
+     - tgzs
+     - wheels
 
 ### Supported OSes / Architectures:
 
 - OSes
-    - Linux
-    - MacOS
-    - Windows
+  - Linux
+  - MacOS
+  - Windows
 - Architectures
-    - x86_64
-    - arm64
+  - x86_64
+  - arm64
 
 ### Building `poktroll_clients` python package
 
