@@ -2,11 +2,7 @@ from poktroll_clients import (
     go_ref,
     ffi,
     libpoktroll_clients,
-    GoManagedMem,
-    BlockQueryClient,
-    Supply,
-    check_err,
-    check_ref,
+    GoManagedMem, BlockQueryClient, Supply, check_err, check_ref,
 )
 from poktroll_clients.proto.poktroll.application.types_pb2 import Application
 from poktroll_clients.proto.poktroll.gateway.types_pb2 import Gateway
@@ -32,14 +28,14 @@ class QueryClient(GoManagedMem):
         if deps_ref == -1:
             deps_ref = _new_query_client_depinject_config(query_node_rpc_url)
 
-        self_ref = libpoktroll_clients.NewQueryClient(deps_ref, query_node_rpc_url.encode("utf-8"), self.err_ptr)
+        self_ref = libpoktroll_clients.NewQueryClient(deps_ref,
+                                                      query_node_rpc_url.encode('utf-8'),
+                                                      self.err_ptr)
         super().__init__(self_ref)
 
     def get_shared_params(self) -> SharedParams:
-        c_serialized_params: SerializedProto = libpoktroll_clients.QueryClient_GetSharedParams(
-            self.go_ref, self.err_ptr
-        )
-        # TODO_IN_THIS_COMMIT: Grep for all TODO_IN_THIS and change them.
+        c_serialized_params: SerializedProto = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref,
+                                                                                               self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -47,49 +43,44 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_params)
 
     def get_session_grace_period_end_height(self, query_height: int) -> int:
-        session_grace_period_end_height = libpoktroll_clients.QueryClient_GetSessionGracePeriodEndHeight(
-            self.go_ref, query_height, self.err_ptr
-        )
+        session_grace_period_end_height = libpoktroll_clients.QueryClient_GetSessionGracePeriodEndHeight(self.go_ref,
+                                                                                                         query_height,
+                                                                                                         self.err_ptr)
         check_err(self.err_ptr)
 
         return session_grace_period_end_height
 
     def get_claim_window_open_height(self, query_height: int) -> int:
-        claim_window_open_height = libpoktroll_clients.QueryClient_GetClaimWindowOpenHeight(
-            self.go_ref, query_height, self.err_ptr
-        )
+        claim_window_open_height = libpoktroll_clients.QueryClient_GetClaimWindowOpenHeight(self.go_ref, query_height,
+                                                                                            self.err_ptr)
         check_err(self.err_ptr)
 
         return claim_window_open_height
 
     def get_earliest_supplier_claim_commit_height(self, query_height: int, supplier_operator_address: str) -> int:
         earliest_supplier_claim_commit_height = libpoktroll_clients.QueryClient_GetEarliestSupplierClaimCommitHeight(
-            self.go_ref, query_height, supplier_operator_address.encode("utf-8"), self.err_ptr
-        )
+            self.go_ref, query_height, supplier_operator_address.encode('utf-8'), self.err_ptr)
         check_err(self.err_ptr)
 
         return earliest_supplier_claim_commit_height
 
     def get_proof_window_open_height(self, query_height: int) -> int:
-        proof_window_open_height = libpoktroll_clients.QueryClient_GetProofWindowOpenHeight(
-            self.go_ref, query_height, self.err_ptr
-        )
+        proof_window_open_height = libpoktroll_clients.QueryClient_GetProofWindowOpenHeight(self.go_ref, query_height,
+                                                                                            self.err_ptr)
         check_err(self.err_ptr)
 
         return proof_window_open_height
 
     def get_earliest_supplier_proof_commit_height(self, query_height: int, supplier_operator_address: str) -> int:
         earliest_supplier_proof_commit_height = libpoktroll_clients.QueryClient_GetEarliestSupplierProofCommitHeight(
-            self.go_ref, query_height, supplier_operator_address.encode("utf-8"), self.err_ptr
-        )
+            self.go_ref, query_height, supplier_operator_address.encode('utf-8'), self.err_ptr)
         check_err(self.err_ptr)
 
         return earliest_supplier_proof_commit_height
 
     def get_compute_units_to_tokens_multiplier(self) -> int:
         compute_units_to_tokens_multiplier = libpoktroll_clients.QueryClient_GetComputeUnitsToTokensMultiplier(
-            self.go_ref, self.err_ptr
-        )
+            self.go_ref, self.err_ptr)
         check_err(self.err_ptr)
 
         return compute_units_to_tokens_multiplier
@@ -136,8 +127,7 @@ class QueryClient(GoManagedMem):
 
     def get_application(self, app_address: str) -> Application:
         c_serialized_app = libpoktroll_clients.QueryClient_GetApplication(
-            self.go_ref, app_address.encode("utf-8"), self.err_ptr
-        )
+            self.go_ref, app_address.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -171,8 +161,7 @@ class QueryClient(GoManagedMem):
 
     def get_supplier(self, supplier_operator_address: str) -> Supplier:
         c_serialized_supplier = libpoktroll_clients.QueryClient_GetSupplier(
-            self.go_ref, supplier_operator_address.encode("utf-8"), self.err_ptr
-        )
+            self.go_ref, supplier_operator_address.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -189,8 +178,7 @@ class QueryClient(GoManagedMem):
 
     def get_session(self, app_address: str, service_id: str, block_height: int) -> Session:
         c_serialized_session = libpoktroll_clients.QueryClient_GetSession(
-            self.go_ref, app_address.encode("utf-8"), service_id.encode("utf-8"), block_height, self.err_ptr
-        )
+            self.go_ref, app_address.encode('utf-8'), service_id.encode('utf-8'), block_height, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -199,8 +187,7 @@ class QueryClient(GoManagedMem):
 
     def get_service(self, service_id: str) -> Service:
         c_serialized_service = libpoktroll_clients.QueryClient_GetService(
-            self.go_ref, service_id.encode("utf-8"), self.err_ptr
-        )
+            self.go_ref, service_id.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -209,17 +196,17 @@ class QueryClient(GoManagedMem):
 
     def get_service_relay_difficulty(self, service_id: str) -> int:
         c_service_relay_difficulty = libpoktroll_clients.QueryClient_GetServiceRelayDifficulty(
-            self.go_ref, service_id.encode("utf-8"), self.err_ptr
-        )
+            self.go_ref, service_id.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
+
 
         serialized_service_relay_difficulty = SerializedProto.from_c_struct(c_service_relay_difficulty)
         return deserialize_protobuf(serialized_service_relay_difficulty)
 
 
 def _new_query_client_depinject_config(
-    query_node_rpc_url: str,
+        query_node_rpc_url: str,
 ) -> go_ref:
     """
     Construct the required dependencies for the query client:

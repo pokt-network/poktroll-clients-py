@@ -12,9 +12,10 @@ Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/githu
   - [From Source](#from-source)
     - [Option 1: Cloning the repository](#option-1-cloning-the-repository)
     - [Option 2. Download \& install the release wheel](#option-2-download--install-the-release-wheel)
-    - [Option 3. Download and unpack a release tarball](#option-3-download-and-unpack-a-release-tarball)
-- [Usage - Getting Started](#usage---getting-started)
-  - [Start a Poktroll Localnet](#start-a-poktroll-localnet)
+    - [Option 3: Download and unpack a release tarball](#option-3-download-and-unpack-a-release-tarball)
+    - [Option 4: Build from source](#option-4-build-from-source)
+  - [Option 1: LocalNet](#option-1-localnet)
+  - [Option 1: Beta TestNet](#option-1-beta-testnet)
   - [Usage Examples](#usage-examples)
 - [`poktroll-clients` Development](#poktroll-clients-development)
 
@@ -49,13 +50,12 @@ see all available tags and select the one you want.
 
 #### Option 1: Cloning the repository
 
-**TODO_IN_THIS_COMMIT: FIX THE MISSING DYLIB INSTALLATION INSTRUCTIONS.**
-
 Clone the repository and checkout the desired release version tag.
 
 ```bash
 git clone https://github.com/pokt-network/poktroll-clients-py
 git checkout v0.2.0a0.dev1
+# TODO_IN_THIS_COMMIT: What is intended to be run here?
 pip install . # add -e flag to install in editable mode and reflect local changes
 ```
 
@@ -66,34 +66,66 @@ pip install . # add -e flag to install in editable mode and reflect local change
 Download and install a release wheel from the [releases page](https://github.com/pokt-network/poktroll-clients-py/releases).
 
 ```bash
-wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.1.0a1/poktroll_clients-0.1.0a1.dev4-py3-none-any.whl
-pip install ./poktroll_clients-0.1.0a1-py3-none-any.whl
+# TODO_IN_THIS_COMMIT: Why is there no .whl file generated/uploaded for v0.2.0a0.dev1? https://github.com/pokt-network/poktroll-clients-py/releases/tag/v0.2.0a0.dev1
+wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.2.0a0.dev1/poktroll_clients-0.2.0a0.dev1.dev4-py3-none-any.whl
+pip install ./poktroll_clients-0.2.0a0.dev1-py3-none-any.whl
 ```
 
 OR
 
 ```bash
-pipenv install ./poktroll_clients-0.1.0a1-py3-none-any.whl
+pipenv install ./poktroll_clients-0.2.0a0.dev1-py3-none-any.whl
 ```
 
-#### Option 3. Download and unpack a release tarball
+#### Option 3: Download and unpack a release tarball
 
 Download and unpack a release tarball from the [releases page](https://github.com/pokt-network/poktroll-clients-py/releases).
 
 ```bash
-wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.2.0a0.dev1/poktroll_clients-0.1.0a1.tar.gz
-pip install ./poktroll_clients-0.1.0a1.tar.gz
+wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.2.0a0.dev1/poktroll_clients-0.2.0a0.dev1.tar.gz
+pip install ./poktroll_clients-0.2.0a0.dev1.tar.gz
 ```
 
 OR
 
 ```bash
-pipenv install ./poktroll_clients-0.1.0a1.tar.gz
+pipenv install ./poktroll_clients-0.2.0a0.dev1.tar.gz
 ```
 
-## Usage - Getting Started
+#### Option 4: Build from source
 
-### Start a Poktroll Localnet
+Start a docker container and build the binaries following the instructions
+from the [release process](./docs/release_process.md):
+
+```bash
+docker run --rm -it -v $(pwd):/poktroll-clients-py python:3.11 bash
+```
+
+Build the binaries in the docker container:
+
+```bash
+cd /poktroll-clients-py
+pip install pipenv build
+pipenv install --system
+python -m build
+```
+
+On the host machine, install the generated .whl file:
+
+```bash
+# pip install pipenv
+# pipenv install
+# pipenv shell
+pip install ./dist/poktroll_clients-0.2.0a0.dev1-py3-none-any.whl
+
+# (Optional) Check the installed files
+pip show -f poktroll-clients
+
+# (Optional) Check that everything is working
+python example.py
+```
+
+### Option 1: LocalNet
 
 For details on how to run a poktroll localnet
 [here](https://dev.poktroll.com/develop/developer_guide/quickstart).
@@ -109,6 +141,8 @@ make localnet_up
 # After the validator service is running (in a separate terminal)
 make acc_initialize_pubkeys
 ```
+
+### Option 1: Beta TestNet
 
 ### Usage Examples
 

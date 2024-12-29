@@ -56,9 +56,15 @@ cd /poktroll-clients-py
 pip install pipenv build
 pipenv install --system
 python -m build
+
+# Check the new files in the dist/ directory
+ls dist/
 ```
 
 #### Publish to PyPI
+
+> [!IMPORTANT]
+> Only run this step when you are ready to publish the package to PyPI.
 
 ```bash
 twine upload dist/*

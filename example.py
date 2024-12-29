@@ -44,9 +44,7 @@ gateway2_addr = "pokt15w3fhfyc0lttv7r585e2ncpf6t2kl9uh8rsnyz"
 
 async def main():
     # Application 3 tx client (app3 SHOULD NOT be staked)
-    app_tx_client = TxClient(
-        "app3", query_node_rpc_url=query_node_rpc_url, tx_node_rpc_url=tx_node_rpc_url
-    )
+    app_tx_client = TxClient("app3", query_node_rpc_url=query_node_rpc_url, tx_node_rpc_url=tx_node_rpc_url)
 
     # Stake and delegate application 3 to gateways 1 (in one tx)
     await app_tx_client.sign_and_broadcast(
