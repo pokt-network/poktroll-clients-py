@@ -1,6 +1,13 @@
-# Release Process
+# Release Process <!-- omit in toc -->
 
-### Steps
+- [Steps](#steps)
+  - [Supported OSes / Architectures:](#supported-oses--architectures)
+  - [Building `poktroll_clients` python package](#building-poktroll_clients-python-package)
+    - [Start a docker container](#start-a-docker-container)
+    - [Build the binaries](#build-the-binaries)
+    - [Publish to PyPI](#publish-to-pypi)
+
+## Steps
 
 1. cpack macos installer
 2. cpack windows installer
@@ -31,18 +38,28 @@
 
 ### Building `poktroll_clients` python package
 
-```bash
-# TODO_IMPROVE: figure out why `python -m build` seems to do nothing in the pipenv virtualenv.
-# Using docker as a workaround for isolation between build and host python envs.
+#### Start a docker container
 
+TODO_IMPROVE: figure out why `python -m build` seems to do nothing in the pipenv virtualenv.
+Using docker as a workaround for isolation between build and host python envs.
+
+```bash
 docker run --rm -it -v $(pwd):/poktroll-clients-py python:3.11 bash
-# Inside docker container:
+```
+
+#### Build the binaries
+
+The following commands will output the build artifacts to the host's `poktroll-clients-py/dist/` directory.
+
+```bash
 cd /poktroll-clients-py
 pip install pipenv build
 pipenv install --system
 python -m build
-# Build output will be in `poktroll-clients-py/dist/` on the host.
+```
 
-# Publish to PyPI
+#### Publish to PyPI
+
+```bash
 twine upload dist/*
 ```

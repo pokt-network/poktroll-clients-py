@@ -29,6 +29,12 @@ tx client will connect and broadcast signed transactions. It MUST use the tcp://
 # tx_node_rpc_url = "tcp://127.0.0.1:26657"
 tx_node_rpc_url = "https://shannon-testnet-grove-grpc.beta.poktroll.com"
 
+tx_client = TxClient(
+    signing_key_name,
+    query_node_rpc_url=query_node_rpc_url,
+    tx_node_rpc_url=tx_node_rpc_url,
+)
+
 query_client = QueryClient(query_node_rpc_url)
 
 app3_addr = "pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex"

@@ -6,11 +6,17 @@ Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/githu
 
 ## Table of Contents <!-- omit in toc -->
 
-- [Download and install from source via **any one** of the following (e.g., for version `0.1.0a1`):](#download-and-install-from-source-via-any-one-of-the-following-eg-for-version-010a1) - [Option 1: Cloning the repository](#option-1-cloning-the-repository) - [2. Download \& install the release wheel](#2-download--install-the-release-wheel) - [3. Download and unpack a release tarball](#3-download-and-unpack-a-release-tarball)
-  - [Usage - Getting Started](#usage---getting-started)
-    - [Start a Poktroll Localnet](#start-a-poktroll-localnet)
-    - [Usage Examples](#usage-examples)
-    - [Local Development Environment Setup](#local-development-environment-setup)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Using PyPI (`pip`)](#using-pypi-pip)
+  - [From Source](#from-source)
+    - [Option 1: Cloning the repository](#option-1-cloning-the-repository)
+    - [Option 2. Download \& install the release wheel](#option-2-download--install-the-release-wheel)
+    - [Option 3. Download and unpack a release tarball](#option-3-download-and-unpack-a-release-tarball)
+- [Usage - Getting Started](#usage---getting-started)
+  - [Start a Poktroll Localnet](#start-a-poktroll-localnet)
+  - [Usage Examples](#usage-examples)
+- [`poktroll-clients` Development](#poktroll-clients-development)
 
 ## Installation
 
@@ -22,17 +28,10 @@ Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/githu
 ### Prerequisites
 
 1. Install the [poktroll CLI](https://dev.poktroll.com/operate/user_guide/install)
-2.
+2. If you're using macOS, run `brew install cmake pkg-config`
+3. ???
 
 - [libpoktroll-clients](https://github.com/pokt-network/libpoktroll-clients)
-
-### macOS Instructions
-
-<!-- In order to use this library on macOS, you MUST install the shared library -->
-
-```
-brew install cmake pkg-config
-```
 
 ### Using PyPI (`pip`)
 
@@ -50,6 +49,8 @@ see all available tags and select the one you want.
 
 #### Option 1: Cloning the repository
 
+**TODO_IN_THIS_COMMIT: FIX THE MISSING DYLIB INSTALLATION INSTRUCTIONS.**
+
 Clone the repository and checkout the desired release version tag.
 
 ```bash
@@ -58,12 +59,14 @@ git checkout v0.2.0a0.dev1
 pip install . # add -e flag to install in editable mode and reflect local changes
 ```
 
-#### 2. Download & install the release wheel
+#### Option 2. Download & install the release wheel
+
+**TODO_IN_THIS_COMMIT: FIX THE MISSING DYLIB INSTALLATION INSTRUCTIONS.**
 
 Download and install a release wheel from the [releases page](https://github.com/pokt-network/poktroll-clients-py/releases).
 
 ```bash
-wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.2.0a0.dev1/poktroll_clients-0.1.0a1-py3-none-any.whl
+wget https://github.com/pokt-network/poktroll-clients-py/releases/download/v0.1.0a1/poktroll_clients-0.1.0a1.dev4-py3-none-any.whl
 pip install ./poktroll_clients-0.1.0a1-py3-none-any.whl
 ```
 
@@ -73,7 +76,7 @@ OR
 pipenv install ./poktroll_clients-0.1.0a1-py3-none-any.whl
 ```
 
-#### 3. Download and unpack a release tarball
+#### Option 3. Download and unpack a release tarball
 
 Download and unpack a release tarball from the [releases page](https://github.com/pokt-network/poktroll-clients-py/releases).
 
@@ -109,33 +112,16 @@ make acc_initialize_pubkeys
 
 ### Usage Examples
 
-<details>
-<summary><b>Imports</b></summary>
-
 ```python
+from pprint import pprint
 import asyncio
-from poktroll_clients.proto.poktroll.gateway.tx_pb2 import *
 from poktroll_clients.proto.poktroll.application.tx_pb2 import *
 from poktroll_clients.proto.poktroll.shared.service_pb2 import *
 from poktroll_clients.proto.cosmos.base.v1beta1.coin_pb2 import *
-from poktroll_clients.proto.cosmos.bank.v1beta1.tx_pb2 import *
 from poktroll_clients import (
-    SupplyMany,
-    EventsQueryClient,
-    BlockQueryClient,
-    BlockClient,
-    TxContext,
-    TxClient
+    TxClient,
+    QueryClient,
 )
-```
-
-</details>
-
-<details>
-<summary><b>Dependency Construction</b></summary>
-
-```python
-# imports... see imports example above.
 
 """
 Signing key name should match the name of a key in the local poktrolld keyring
@@ -145,27 +131,18 @@ See `poktrolld keys -h` for more information.
 signing_key_name = "key-name"
 
 """
-Query node RPC URL is the HTTP URL for the poktroll RPC endpoint to which the block
-client will send query requests.
+Query node RPC URL is the HTTP URL for the poktroll RPC endpoint to which query
+clients will send requests.
 """
-query_node_rpc_url = "http://127.0.0.1:26657"
-
-"""
-Query node RPC websocket URL is the websocket URL for the poktroll RPC endpoint to
-which the events query client will connect and subscribe. It is typically the same
-as query_node_rpc_url, but with the ws:// scheme and /websocket path.
-"""
-query_node_rpc_websocket_url = "ws://127.0.0.1:26657/websocket"
+# query_node_rpc_url = "http://127.0.0.1:26657"
+query_node_rpc_url = "https://shannon-testnet-grove-rpc.beta.poktroll.com"
 
 """
 Tx node RPC URL is the gRPC gateway URL for the poktroll RPC endpoint to which the
 tx client will connect and broadcast signed transactions. It MUST use the tcp:// scheme.
 """
-tx_node_rpc_url = "tcp://127.0.0.1:26657"
-
-
-events_query_client = EventsQueryClient(query_node_rpc_websocket_url)
-block_query_client = BlockQueryClient(query_node_rpc_url)
+# tx_node_rpc_url = "tcp://127.0.0.1:26657"
+tx_node_rpc_url = "https://shannon-testnet-grove-grpc.beta.poktroll.com"
 
 tx_client = TxClient(
     signing_key_name,
@@ -173,20 +150,7 @@ tx_client = TxClient(
     tx_node_rpc_url=tx_node_rpc_url,
 )
 
-block_client_deps_ref = SupplyMany(events_query_client, block_query_client)
-block_client = BlockClient(block_client_deps_ref)
-tx_ctx = TxContext(tx_node_rpc_url)
-
-tx_client_deps_ref = SupplyMany(events_query_client, block_client, tx_ctx)
-example_tx_client = TxClient(tx_client_deps_ref, signing_key_name)
-```
-
-</details>
-
-**Tx Client Usage**
-
-```python
-# imports... see imports example above.
+query_client = QueryClient(query_node_rpc_url)
 
 app3_addr = "pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex"
 gateway1_addr = "pokt15vzxjqklzjtlz7lahe8z2dfe9nm5vxwwmscne4"
@@ -194,33 +158,12 @@ gateway2_addr = "pokt15w3fhfyc0lttv7r585e2ncpf6t2kl9uh8rsnyz"
 
 
 async def main():
-<<<<<<< Updated upstream
-    # build tx_client_deps_ref... see dependency construction example above.
-=======
     # Application 3 tx client (app3 SHOULD NOT be staked)
     app_tx_client = TxClient(
         "app3", query_node_rpc_url=query_node_rpc_url, tx_node_rpc_url=tx_node_rpc_url
     )
->>>>>>> Stashed changes
 
-    # Gateway 2 tx client (gateway2 SHOULD NOT be staked)
-    gw_tx_client = TxClient(tx_client_deps_ref, "gateway2")
-
-    # Application 3 tx client (app3 SHOULD NOT be staked)
-    app_tx_client = TxClient(tx_client_deps_ref, "app3")
-
-    # Stake localnet gateway 2
-    await gw_tx_client.sign_and_broadcast(
-        MsgStakeGateway(
-            address=gateway2_addr,
-            stake=Coin(denom="upokt", amount="100000000"),
-        )
-    )
-
-    # Wait a couple of seconds so that the application delegation tx succeeds.
-    await asyncio.sleep(2)
-
-    # Stake and delegate application 3 to gateways 1 and 2 (in one tx)
+    # Stake and delegate application 3 to gateways 1 (in one tx)
     await app_tx_client.sign_and_broadcast(
         MsgStakeApplication(
             address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
@@ -245,23 +188,31 @@ async def main():
         MsgUnstakeApplication(address=app3_addr),
     )
 
-    # Unstake gateway 2
-    await gw_tx_client.sign_and_broadcast(
-        MsgUnstakeGateway(address=gateway2_addr)
-    )
-
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 ```
 
-### Local Development Environment Setup
+## `poktroll-clients` Development
+
+> [!IMPORTANT]
+> This section is only intended for developers of the client library, not its users.
+
+Follow the (opinionated) instructions below to prepare your environment for local development.
 
 ```bash
 git clone https://github.com/pokt-network/poktroll-clients-py
 cd poktroll-clients-py
 
-# Install dependencies
+# Build shared library - NOTE: this will take a while until some import optimizations are done.
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+
+# Install python env dependencies
 pip install pipenv
 pipenv install
 pipenv shell
@@ -277,21 +228,4 @@ pip install -e .
 
 # Run tests (shared library MUST be installed)
 pytest
-```
-
-This step is optional, but necessary if you intend on developing, and locally integrating, modified versions of the `libpoktroll_clients` shared library.
-Otherwise, the steps in the [installation](#installation) section are sufficient to use and develop on the `poktroll_clients` python package (i.e., you can skip this step).
-
-```bash
-git clone https://github.com/byanchriswhite/libpoktroll_clients
-cd libpoktroll_clients
-
-# Build shared library - NOTE: this will take a while until some import optimizations are done.
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
-
-#OR build and install os-specific package; see libpoktroll_clients/README.md.
 ```
