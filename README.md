@@ -137,7 +137,7 @@ async def main():
                              query_node_rpc_url=query_node_rpc_url,
                              tx_node_rpc_url=tx_node_rpc_url)
 
-    # Stake and delegate application 3 to gateways 1 (in one tx)
+    # Stake and delegate application 3 to gateways 1 & 2 (in one tx)
     await app_tx_client.sign_and_broadcast(
         MsgStakeApplication(
             address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
