@@ -1,12 +1,12 @@
 from time import sleep
 
 import pytest
-from poktroll_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
-from poktroll_clients.proto.poktroll.gateway.tx_pb2 import MsgStakeGateway, MsgUnstakeGateway
-from poktroll_clients.proto.poktroll.shared.service_pb2 import ApplicationServiceConfig
-from poktroll_clients.proto.poktroll.application.tx_pb2 import MsgStakeApplication, MsgUnstakeApplication, MsgDelegateToGateway
-from poktroll_clients.proto.cosmos.bank.v1beta1.tx_pb2 import MsgSend
-from poktroll_clients import (
+from pocket_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
+from pocket_clients.proto.pocket.gateway.tx_pb2 import MsgStakeGateway, MsgUnstakeGateway
+from pocket_clients.proto.pocket.shared.service_pb2 import ApplicationServiceConfig
+from pocket_clients.proto.pocket.application.tx_pb2 import MsgStakeApplication, MsgUnstakeApplication, MsgDelegateToGateway
+from pocket_clients.proto.cosmos.bank.v1beta1.tx_pb2 import MsgSend
+from pocket_clients import (
     BlockClient,
     BlockQueryClient,
     SupplyMany,

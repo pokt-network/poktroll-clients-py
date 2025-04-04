@@ -52,9 +52,9 @@ dev = [
 [tool.hatch.build]
 sources = ["src"]
 include = [
-    "src/poktroll_clients/**/*.py",
-    "src/poktroll_clients/**/*.pyi",
-    "src/poktroll_clients/**/*.h",
-    "src/poktroll_clients/**/*.pc.in",
-    "src/poktroll_clients/lib/*"
+    "src/pocket_clients/**/*.py",
+    "src/pocket_clients/**/*.pyi",
+    "src/pocket_clients/**/*.h",
+    "src/pocket_clients/**/*.pc.in",
+    "src/pocket_clients/lib/*"
 ]
