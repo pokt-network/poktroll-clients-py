@@ -51,7 +51,8 @@ async def test_sign_and_broadcast_many_success():
 
     app3_addr = "pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex"
     gateway2_addr = "pokt15w3fhfyc0lttv7r585e2ncpf6t2kl9uh8rsnyz"
-    gateway_addrs = ["pokt15vzxjqklzjtlz7lahe8z2dfe9nm5vxwwmscne4", gateway2_addr]
+    pnf_addr = "pokt1eeeksh2tvkh7wzmfrljnhw4wrhs55lcuvmekkw"
+    faucet_addr = "pokt1awtlw5sjmw2f5lgj8ekdkaqezphgz88rdk93sk"
 
     try:
         await gateway2_tx_client.sign_and_broadcast(
@@ -68,10 +69,16 @@ async def test_sign_and_broadcast_many_success():
                 stake=Coin(denom="upokt", amount="222200000"),
                 services=[ApplicationServiceConfig(service_id="anvil")]
             ),
-            *[MsgDelegateToGateway(
+            MsgDelegateToGateway(
                 app_address=app3_addr,
-                gateway_address=gateway_addr
-            ) for gateway_addr in gateway_addrs],
+                gateway_address=gateway2_addr,
+            ),
+            # Throw in some sends messages for no particular reason...
+            *[MsgSend(
+                from_address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
+                to_address=to_addr,
+                amount=[Coin(denom="upokt", amount="100")]
+            ) for to_addr in [pnf_addr, faucet_addr]],
         ]
 
         await app3_tx_client.sign_and_broadcast(*msgs)

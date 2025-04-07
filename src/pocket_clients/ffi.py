@@ -206,9 +206,9 @@ def get_packaged_library_name(system: str, machine: str) -> str:
     go_arch = machine_to_go_arch(machine)
 
     if system == "Linux":
-        return f"libpoktroll_clients-{go_arch}.so"
+        return f"libpocket_clients-{go_arch}.so"
     elif system == "Darwin":
-        return f"libpoktroll_clients-{go_arch}.dylib"
+        return f"libpocket_clients-{go_arch}.dylib"
     elif system == "Windows":
         return f"pocket_clients-{go_arch}.dll"
     else:
@@ -263,9 +263,9 @@ if lib_load_path is None:
 print(f"Loading shared library from: {lib_load_path}")
 
 # Load the shared library.
-libpoktroll_clients = ffi.dlopen(str(lib_load_path))
+libpocket_clients = ffi.dlopen(str(lib_load_path))
 
 # TODO_UP_NEXT: select shared library based on OS/Arch.
-# libpoktroll_clients = ffi.dlopen(str(get_library_path()))
+# libpocket_clients = ffi.dlopen(str(get_library_path()))
 # TODO_UP_NEXT: add env var to add include directory with OS installed version.
 # TODO_CONSIDERATION: look for an OS installed shared library if there's no packaged one for the current OS/Arch.

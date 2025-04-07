@@ -5,19 +5,31 @@ from typing import List
 
 from google.protobuf import symbol_database, message
 
-from pocket_clients import go_ref, libpoktroll_clients, check_err
+from pocket_clients import go_ref, libpocket_clients, check_err
 from pocket_clients.cases import camel_to_snake_case
 from pocket_clients.ffi import ffi
 
 
-@dataclass
 class SerializedProto:
-    """
-    Represents a serialized protobuf message with its type URL and binary data.
-    Handles conversion to C structures while ensuring proper memory management.
-    """
-    type_url: str
-    data: bytes
+    def __init__(self, type_url="", data=b""):
+        self.type_url = type_url
+        self.data = data
+
+    def to_c_struct(self):
+        c_struct = ffi.new("serialized_proto *")
+
+        # Convert and store type_url
+        self._type_url_bytes = self.type_url.encode('utf-8')
+        self._c_type_url = ffi.new(f"uint8_t[{len(self._type_url_bytes)}]", self._type_url_bytes)
+        c_struct.type_url = self._c_type_url
+        c_struct.type_url_length = len(self._type_url_bytes)
+
+        # Convert and store data
+        self._c_data = ffi.new(f"uint8_t[{len(self.data)}]", self.data)
+        c_struct.data = self._c_data
+        c_struct.data_length = len(self.data)
+
+        return c_struct
 
     @staticmethod
     def from_c_struct(c_serialized_proto: ffi.CData):
@@ -26,42 +38,47 @@ class SerializedProto:
             data=(bytes(ffi.buffer(c_serialized_proto.data, c_serialized_proto.data_length))),
         )
 
-    def __init__(self, c_serialized_proto: ffi.CData = None, type_url: str = "", data: bytes = b""):
-        self.type_url = type_url
-        self.data = data
 
-        if c_serialized_proto is not None:
-            self.type_url = ffi.string(c_serialized_proto.type_url, c_serialized_proto.type_url_length).decode('utf-8')
-            self.data = bytes(ffi.buffer(c_serialized_proto.data, c_serialized_proto.data_length))
-
-    def to_c_struct(self) -> ffi.CData:
-        """
-        Converts the Python protobuf data to a C struct while preserving the underlying memory.
-        Returns a C serialized_proto struct pointer.
-        """
-        serialized_proto = ffi.new("serialized_proto *")
-
-        # Create buffers and store them as instance attributes to prevent GC
-        self._type_url_bytes = self.type_url.encode('utf-8')
-        self._type_url_buffer = ffi.new("uint8_t[]", self._type_url_bytes)
-        self._data_buffer = ffi.new("uint8_t[]", self.data)
-
-        # Assign the buffers to the C struct
-        serialized_proto.type_url = self._type_url_buffer
-        serialized_proto.type_url_length = len(self._type_url_bytes)
-        serialized_proto.data = self._data_buffer
-        serialized_proto.data_length = len(self.data)
-
-        return serialized_proto
-
-
-@dataclass
 class ProtoMessageArray:
-    """
-    Represents an array of serialized protobuf messages.
-    Handles conversion to C structures while ensuring proper memory management.
-    """
-    messages: List[SerializedProto]
+    def __init__(self, messages=None):
+        self.messages = messages or []
+
+    def to_c_struct(self):
+        # Keep all C objects alive for the lifetime of this object
+        self._all_c_objects = []
+
+        # Create array structure
+        c_array = ffi.new("proto_message_array *")
+        c_array.num_messages = len(self.messages)
+
+        # Create serialized_proto array
+        c_messages = ffi.new(f"serialized_proto[{len(self.messages)}]")
+        c_array.messages = c_messages
+
+        # Store references to prevent GC
+        self._all_c_objects.append(c_array)
+        self._all_c_objects.append(c_messages)
+
+        # Create and fill each message
+        for i, msg in enumerate(self.messages):
+            # Create type_url buffer
+            type_url_bytes = msg.type_url.encode('utf-8')
+            c_type_url = ffi.new(f"uint8_t[{len(type_url_bytes)}]", type_url_bytes)
+
+            # Create data buffer
+            c_data = ffi.new(f"uint8_t[{len(msg.data)}]", msg.data)
+
+            # Set message fields
+            c_messages[i].type_url = c_type_url
+            c_messages[i].type_url_length = len(type_url_bytes)
+            c_messages[i].data = c_data
+            c_messages[i].data_length = len(msg.data)
+
+            # Store references
+            self._all_c_objects.append(c_type_url)
+            self._all_c_objects.append(c_data)
+
+        return c_array
 
     @staticmethod
     def from_c_struct(c_proto_message_array: ffi.CData):
@@ -69,33 +86,6 @@ class ProtoMessageArray:
         for i in range(c_proto_message_array.num_messages):
             serialized_proto = SerializedProto.from_c_struct(c_proto_message_array.messages[i])
             proto_message_array.messages.append(serialized_proto)
-
-        return proto_message_array
-
-    def to_c_struct(self) -> ffi.CData:
-        """
-        Converts the Python protobuf message array to a C struct while preserving the underlying memory.
-        Returns a C proto_message_array struct pointer.
-        """
-        # Create the array structure
-        proto_message_array = ffi.new("proto_message_array *")
-        proto_message_array.num_messages = len(self.messages)
-
-        # Allocate the array of message structures
-        proto_message_array.messages = ffi.new("serialized_proto[]", len(self.messages))
-
-        # Convert each message and store C structs as instance attributes
-        self._message_structs = []
-        for i, msg in enumerate(self.messages):
-            # Create and store the C struct for this message
-            c_msg = msg.to_c_struct()
-            self._message_structs.append(c_msg)
-
-            # Copy the data to the array
-            proto_message_array.messages[i].type_url = c_msg.type_url
-            proto_message_array.messages[i].type_url_length = c_msg.type_url_length
-            proto_message_array.messages[i].data = c_msg.data
-            proto_message_array.messages[i].data_length = c_msg.data_length
 
         return proto_message_array
 
@@ -116,7 +106,7 @@ def get_serialized_proto(go_proto_ref: go_ref) -> SerializedProto:
     """
     err_ptr = ffi.new("char **")
 
-    c_serialized_proto = libpoktroll_clients.GetGoProtoAsSerializedProto(go_proto_ref, err_ptr)
+    c_serialized_proto = libpocket_clients.GetGoProtoAsSerializedProto(go_proto_ref, err_ptr)
 
     check_err(err_ptr)
 

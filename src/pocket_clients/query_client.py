@@ -1,7 +1,7 @@
 from pocket_clients import (
     go_ref,
     ffi,
-    libpoktroll_clients,
+    libpocket_clients,
     GoManagedMem, BlockQueryClient, Supply, check_err, check_ref,
 )
 from pocket_clients.proto.pocket.application.types_pb2 import Application
@@ -21,20 +21,29 @@ class QueryClient(GoManagedMem):
     A client which can query for any pocket module state.
     """
 
-    go_ref: go_ref
-    err_ptr: ffi.CData
+    # go_ref: go_ref
+    # err_ptr: ffi.CData
 
     def __init__(self, query_node_rpc_url: str, deps_ref: go_ref = -1):
+        # Always initialize err_ptr
+        # DEV_NOTE: So long as the QueryClient API remains synchronous, it is
+        # safe to reuse a single error pointer for the lifetime of this instance.
+        self.err_ptr = ffi.new("char **")
+
         if deps_ref == -1:
             deps_ref = _new_query_client_depinject_config(query_node_rpc_url)
 
-        self_ref = libpoktroll_clients.NewQueryClient(deps_ref,
-                                                      query_node_rpc_url.encode('utf-8'),
-                                                      self.err_ptr)
+        self_ref = libpocket_clients.NewQueryClient(deps_ref,
+                                                    query_node_rpc_url.encode('utf-8'),
+                                                    self.err_ptr)
+        # Check for errors before calling super().__init__
+        check_err(self.err_ptr)
+
+        # Now pass the reference to the parent constructor
         super().__init__(self_ref)
 
     def get_shared_params(self) -> SharedParams:
-        c_serialized_params: SerializedProto = libpoktroll_clients.QueryClient_GetSharedParams(self.go_ref,
+        c_serialized_params: SerializedProto = libpocket_clients.QueryClient_GetSharedParams(self.go_ref,
                                                                                                self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
@@ -43,7 +52,7 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_params)
 
     def get_session_grace_period_end_height(self, query_height: int) -> int:
-        session_grace_period_end_height = libpoktroll_clients.QueryClient_GetSessionGracePeriodEndHeight(self.go_ref,
+        session_grace_period_end_height = libpocket_clients.QueryClient_GetSessionGracePeriodEndHeight(self.go_ref,
                                                                                                          query_height,
                                                                                                          self.err_ptr)
         check_err(self.err_ptr)
@@ -51,42 +60,42 @@ class QueryClient(GoManagedMem):
         return session_grace_period_end_height
 
     def get_claim_window_open_height(self, query_height: int) -> int:
-        claim_window_open_height = libpoktroll_clients.QueryClient_GetClaimWindowOpenHeight(self.go_ref, query_height,
+        claim_window_open_height = libpocket_clients.QueryClient_GetClaimWindowOpenHeight(self.go_ref, query_height,
                                                                                             self.err_ptr)
         check_err(self.err_ptr)
 
         return claim_window_open_height
 
     def get_earliest_supplier_claim_commit_height(self, query_height: int, supplier_operator_address: str) -> int:
-        earliest_supplier_claim_commit_height = libpoktroll_clients.QueryClient_GetEarliestSupplierClaimCommitHeight(
+        earliest_supplier_claim_commit_height = libpocket_clients.QueryClient_GetEarliestSupplierClaimCommitHeight(
             self.go_ref, query_height, supplier_operator_address.encode('utf-8'), self.err_ptr)
         check_err(self.err_ptr)
 
         return earliest_supplier_claim_commit_height
 
     def get_proof_window_open_height(self, query_height: int) -> int:
-        proof_window_open_height = libpoktroll_clients.QueryClient_GetProofWindowOpenHeight(self.go_ref, query_height,
+        proof_window_open_height = libpocket_clients.QueryClient_GetProofWindowOpenHeight(self.go_ref, query_height,
                                                                                             self.err_ptr)
         check_err(self.err_ptr)
 
         return proof_window_open_height
 
     def get_earliest_supplier_proof_commit_height(self, query_height: int, supplier_operator_address: str) -> int:
-        earliest_supplier_proof_commit_height = libpoktroll_clients.QueryClient_GetEarliestSupplierProofCommitHeight(
+        earliest_supplier_proof_commit_height = libpocket_clients.QueryClient_GetEarliestSupplierProofCommitHeight(
             self.go_ref, query_height, supplier_operator_address.encode('utf-8'), self.err_ptr)
         check_err(self.err_ptr)
 
         return earliest_supplier_proof_commit_height
 
     def get_compute_units_to_tokens_multiplier(self) -> int:
-        compute_units_to_tokens_multiplier = libpoktroll_clients.QueryClient_GetComputeUnitsToTokensMultiplier(
+        compute_units_to_tokens_multiplier = libpocket_clients.QueryClient_GetComputeUnitsToTokensMultiplier(
             self.go_ref, self.err_ptr)
         check_err(self.err_ptr)
 
         return compute_units_to_tokens_multiplier
 
     def get_application_params(self) -> ApplicationParams:
-        c_serialized_params = libpoktroll_clients.QueryClient_GetApplicationParams(self.go_ref, self.err_ptr)
+        c_serialized_params = libpocket_clients.QueryClient_GetApplicationParams(self.go_ref, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -97,13 +106,13 @@ class QueryClient(GoManagedMem):
     # Go method dependencies are available.
 
     # def get_supplier_params(self) -> SupplierParams:
-    #     response_ref = libpoktroll_clients.QueryClient_GetSupplierParams(self.go_ref, self.err_ptr)
+    #     response_ref = libpocket_clients.QueryClient_GetSupplierParams(self.go_ref, self.err_ptr)
 
     # def get_gateway_params(self) -> GatewayParams:
-    #     response_ref = libpoktroll_clients.QueryClient_GetGatewayParams(self.go_ref, self.err_ptr)
+    #     response_ref = libpocket_clients.QueryClient_GetGatewayParams(self.go_ref, self.err_ptr)
 
     def get_session_params(self) -> SessionParams:
-        c_serialized_params = libpoktroll_clients.QueryClient_GetSessionParams(self.go_ref, self.err_ptr)
+        c_serialized_params = libpocket_clients.QueryClient_GetSessionParams(self.go_ref, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -111,10 +120,10 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_params)
 
     # def get_service_params(self) -> ServiceParams:
-    #     response_ref = libpoktroll_clients.QueryClient_GetServiceParams(self.go_ref, self.err_ptr)
+    #     response_ref = libpocket_clients.QueryClient_GetServiceParams(self.go_ref, self.err_ptr)
 
     def get_proof_params(self) -> ProofParams:
-        c_serialized_params = libpoktroll_clients.QueryClient_GetProofParams(self.go_ref, self.err_ptr)
+        c_serialized_params = libpocket_clients.QueryClient_GetProofParams(self.go_ref, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
 
         check_err(self.err_ptr)
@@ -123,10 +132,10 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_params)
 
     # def get_tokenomics_params(self) -> TokenomicsParams:
-    #     response_ref = libpoktroll_clients.QueryClient_GetTokenomicsParams(self.go_ref, self.err_ptr)
+    #     response_ref = libpocket_clients.QueryClient_GetTokenomicsParams(self.go_ref, self.err_ptr)
 
     def get_application(self, app_address: str) -> Application:
-        c_serialized_app = libpoktroll_clients.QueryClient_GetApplication(
+        c_serialized_app = libpocket_clients.QueryClient_GetApplication(
             self.go_ref, app_address.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
@@ -135,7 +144,7 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_app)
 
     def get_all_applications(self) -> list[Application]:
-        c_proto_message_array = libpoktroll_clients.QueryClient_GetAllApplications(self.go_ref, self.err_ptr)
+        c_proto_message_array = libpocket_clients.QueryClient_GetAllApplications(self.go_ref, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
@@ -143,7 +152,7 @@ class QueryClient(GoManagedMem):
         return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
 
     # def get_gateway(self, gateway_address: str) -> Gateway:
-    #     c_serialized_gateway = libpoktroll_clients.QueryClient_GetGateway(
+    #     c_serialized_gateway = libpocket_clients.QueryClient_GetGateway(
     #         self.go_ref, gateway_address.encode('utf-8'), self.err_ptr)
     #     # TODO_IN_THIS_COMMIT: free the C struct and its members
     #     check_err(self.err_ptr)
@@ -152,7 +161,7 @@ class QueryClient(GoManagedMem):
     #     return deserialize_protobuf(serialized_gateway)
     #
     # def get_all_gateways(self) -> list[Gateway]:
-    #     c_proto_message_array = libpoktroll_clients.QueryClient_GetAllGateways(self.go_ref, self.err_ptr)
+    #     c_proto_message_array = libpocket_clients.QueryClient_GetAllGateways(self.go_ref, self.err_ptr)
     #     # TODO_IN_THIS_COMMIT: free the C struct and its members
     #     check_err(self.err_ptr)
     #
@@ -160,7 +169,7 @@ class QueryClient(GoManagedMem):
     #     return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
 
     def get_supplier(self, supplier_operator_address: str) -> Supplier:
-        c_serialized_supplier = libpoktroll_clients.QueryClient_GetSupplier(
+        c_serialized_supplier = libpocket_clients.QueryClient_GetSupplier(
             self.go_ref, supplier_operator_address.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
@@ -169,7 +178,7 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_supplier)
 
     # def get_all_suppliers(self) -> list[Supplier]:
-    #     c_proto_message_array = libpoktroll_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
+    #     c_proto_message_array = libpocket_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
     #     # TODO_IN_THIS_COMMIT: free the C struct and its members
     #     check_err(self.err_ptr)
     #
@@ -177,7 +186,7 @@ class QueryClient(GoManagedMem):
     #     return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
 
     def get_session(self, app_address: str, service_id: str, block_height: int) -> Session:
-        c_serialized_session = libpoktroll_clients.QueryClient_GetSession(
+        c_serialized_session = libpocket_clients.QueryClient_GetSession(
             self.go_ref, app_address.encode('utf-8'), service_id.encode('utf-8'), block_height, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
@@ -186,7 +195,7 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_session)
 
     def get_service(self, service_id: str) -> Service:
-        c_serialized_service = libpoktroll_clients.QueryClient_GetService(
+        c_serialized_service = libpocket_clients.QueryClient_GetService(
             self.go_ref, service_id.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
@@ -195,7 +204,7 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_service)
 
     def get_service_relay_difficulty(self, service_id: str) -> int:
-        c_service_relay_difficulty = libpoktroll_clients.QueryClient_GetServiceRelayDifficulty(
+        c_service_relay_difficulty = libpocket_clients.QueryClient_GetServiceRelayDifficulty(
             self.go_ref, service_id.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)

@@ -1,4 +1,4 @@
-from pocket_clients.ffi import ffi, libpoktroll_clients
+from pocket_clients.ffi import ffi, libpocket_clients
 from pocket_clients.go_memory import go_ref, check_err, check_ref, GoManagedMem
 
 
@@ -10,7 +10,7 @@ def Supply(go_ref: go_ref) -> go_ref:
     """
 
     err_ptr = ffi.new("char **")
-    deps_ref = libpoktroll_clients.Supply(go_ref, err_ptr)
+    deps_ref = libpocket_clients.Supply(go_ref, err_ptr)
 
     check_err(err_ptr)
     check_ref(deps_ref)
@@ -29,7 +29,7 @@ def SupplyMany(*go_objs: GoManagedMem) -> go_ref:
     cgo_refs = ffi.new("go_ref[]", go_refs)
     err_ptr = ffi.new("char **")
 
-    deps_ref = libpoktroll_clients.SupplyMany(cgo_refs, len(go_objs), err_ptr)
+    deps_ref = libpocket_clients.SupplyMany(cgo_refs, len(go_objs), err_ptr)
 
     check_err(err_ptr)
     check_ref(deps_ref)

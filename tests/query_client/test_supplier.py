@@ -64,7 +64,6 @@ def test_query_supplier():
                 ]
             )
         ],
-        services_activation_heights_map={},
         unstake_session_end_height=0,
     )
 

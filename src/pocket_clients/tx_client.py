@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 from urllib.parse import urlparse
 
 from atomics import INTEGRAL, atomic, INT
@@ -13,7 +13,7 @@ from pocket_clients import (
     BlockQueryClient,
     SupplyMany,
     TxContext,
-    libpoktroll_clients,
+    libpocket_clients,
     ffi,
     go_ref,
     GoManagedMem,
@@ -31,7 +31,7 @@ class TxClient(GoManagedMem):
     go_ref: go_ref
     err_ptr: ffi.CData
     _callback_idx: INTEGRAL = atomic(width=8, atype=INT)
-    _callback_fns: Dict[int, Tuple[ffi.CData, ffi.CData, ffi.CData]] = {}
+    _callback_scopes: Dict[int, List[any]] = {}
 
     def __init__(self,
                  signing_key_name: str,
@@ -44,10 +44,16 @@ class TxClient(GoManagedMem):
         If deps_ref is not provided, a depinject config will be created using the provided query_node_rpc_url
         and tx_node_rpc_url. If, then, either of these are not provided, a ValueError will be raised.
         """
+
+        # Always initialize err_ptr
+        # TODO_CRITICAL: Because this API remains asynchronous, it IS NOT safe
+        # to reuse a single error pointer for the lifetime of this instance.
+        self.err_ptr = ffi.new("char **")
+
         if deps_ref == -1:
             deps_ref = _new_tx_client_depinject_config(query_node_rpc_url, tx_node_rpc_url)
 
-        go_ref = libpoktroll_clients.NewTxClient(deps_ref, signing_key_name.encode('utf-8'), self.err_ptr)
+        go_ref = libpocket_clients.NewTxClient(deps_ref, signing_key_name.encode('utf-8'), self.err_ptr)
         super().__init__(go_ref)
 
         check_err(self.err_ptr)
@@ -60,8 +66,6 @@ class TxClient(GoManagedMem):
         :return: Future that completes when the transaction is processed.
         """
 
-        op, future = self._new_async_operation()
-
         serialized_msgs = ProtoMessageArray(messages=[
             SerializedProto(
                 type_url=msg.DESCRIPTOR.full_name,
@@ -69,10 +73,22 @@ class TxClient(GoManagedMem):
             ) for msg in msgs
         ])
 
-        err_ch_ref = libpoktroll_clients.TxClient_SignAndBroadcastMany(  # <-- line 71
+        # Get the C struct but KEEP A REFERENCE to serialized_msgs
+        # throughout the lifetime of this function
+        c_serialized_msgs = serialized_msgs.to_c_struct()
+
+        # Store reference to prevent garbage collection
+        # This needs to be at the class level or function level to persist
+        op, future = self._new_async_operation(serialized_msgs, c_serialized_msgs, c_serialized_msgs.messages)
+
+        # # Store reference to prevent garbage collection
+        # # This needs to be at the class level or function level to persist
+        # self._last_serialized_msgs = serialized_msgs
+
+        err_ch_ref = libpocket_clients.TxClient_SignAndBroadcastMany(  # <-- line 71
             op,
             self.go_ref,
-            serialized_msgs.to_c_struct(),
+            c_serialized_msgs,
         )
 
         if err_ch_ref == -1:
@@ -81,7 +97,8 @@ class TxClient(GoManagedMem):
 
         return await future
 
-    def _new_async_operation(self) -> Tuple[ffi.CData, asyncio.Future]:
+    # TODO_IN_THIS_COMMIT: add comment... adds args to the callback scope; i.e. protected from garbage collection until the future is done.
+    def _new_async_operation(self, *callback_scope_args) -> Tuple[ffi.CData, asyncio.Future]:
         """
         Creates a new AsyncOperation with callbacks and associated Future.
         The callbacks are protected from garbage collection by storing in self._callback_fns.
@@ -129,7 +146,7 @@ class TxClient(GoManagedMem):
         op.cleanup = cleanup_cb
 
         # Store callbacks to protect from garbage collection
-        self._callback_fns[next_callback_idx] = (success_cb, error_cb, cleanup_cb)
+        self._callback_scopes[next_callback_idx] = [success_cb, error_cb, cleanup_cb, *callback_scope_args]
 
         return op, future
 
@@ -137,7 +154,7 @@ class TxClient(GoManagedMem):
         """
         Clean up stored callbacks.
         """
-        self._callback_fns.pop(callback_idx)
+        self._callback_scopes.pop(callback_idx)
 
 
 def _new_tx_client_depinject_config(

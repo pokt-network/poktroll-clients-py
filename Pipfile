@@ -7,9 +7,9 @@ name = "pip_conf_index_global"
 cffi = "*"
 mypy-protobuf = "*"
 asyncio = "*"
-protobuf = "*"
 pytest-asyncio = "*"
 atomics = "*"
+protobuf = "*"
 
 [dev-packages]
 pytest = "*"
