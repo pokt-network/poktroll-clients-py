@@ -134,6 +134,7 @@ class MsgClaimMorseAccount(google.protobuf.message.Message):
 
     SHANNON_DEST_ADDRESS_FIELD_NUMBER: builtins.int
     MORSE_SRC_ADDRESS_FIELD_NUMBER: builtins.int
+    MORSE_PUBLIC_KEY_FIELD_NUMBER: builtins.int
     MORSE_SIGNATURE_FIELD_NUMBER: builtins.int
     shannon_dest_address: builtins.str
     """The bech32-encoded address of the Shannon account to which the claimed balance will be minted."""
@@ -141,6 +142,8 @@ class MsgClaimMorseAccount(google.protobuf.message.Message):
     """The hex-encoded address of the Morse account whose balance will be claimed.
     E.g.: 00f9900606fa3d5c9179fc0c8513078a53a2073e
     """
+    morse_public_key: builtins.bytes
+    """The ed25519 public key of the morse account with morse_src_address."""
     morse_signature: builtins.bytes
     """The hex-encoded signature, by the Morse account, of this message (where this field is nil).
     I.e.: morse_signature = private_key.sign(marshal(MsgClaimMorseAccount{morse_signature: nil, ...}))
@@ -150,9 +153,10 @@ class MsgClaimMorseAccount(google.protobuf.message.Message):
         *,
         shannon_dest_address: builtins.str = ...,
         morse_src_address: builtins.str = ...,
+        morse_public_key: builtins.bytes = ...,
         morse_signature: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["morse_signature", b"morse_signature", "morse_src_address", b"morse_src_address", "shannon_dest_address", b"shannon_dest_address"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["morse_public_key", b"morse_public_key", "morse_signature", b"morse_signature", "morse_src_address", b"morse_src_address", "shannon_dest_address", b"shannon_dest_address"]) -> None: ...
 
 global___MsgClaimMorseAccount = MsgClaimMorseAccount
 
@@ -202,6 +206,7 @@ class MsgClaimMorseApplication(google.protobuf.message.Message):
 
     SHANNON_DEST_ADDRESS_FIELD_NUMBER: builtins.int
     MORSE_SRC_ADDRESS_FIELD_NUMBER: builtins.int
+    MORSE_PUBLIC_KEY_FIELD_NUMBER: builtins.int
     MORSE_SIGNATURE_FIELD_NUMBER: builtins.int
     SERVICE_CONFIG_FIELD_NUMBER: builtins.int
     shannon_dest_address: builtins.str
@@ -212,6 +217,8 @@ class MsgClaimMorseApplication(google.protobuf.message.Message):
     """The hex-encoded address of the Morse account whose balance will be claimed.
     E.g.: 00f9900606fa3d5c9179fc0c8513078a53a2073e
     """
+    morse_public_key: builtins.bytes
+    """The ed25519 public key of the morse account with morse_src_address."""
     morse_signature: builtins.bytes
     """The hex-encoded signature, by the Morse account, of this message (where this field is nil).
     I.e.: morse_signature = private_key.sign(marshal(MsgClaimMorseAccount{morse_signature: nil, ...}))
@@ -228,11 +235,12 @@ class MsgClaimMorseApplication(google.protobuf.message.Message):
         *,
         shannon_dest_address: builtins.str = ...,
         morse_src_address: builtins.str = ...,
+        morse_public_key: builtins.bytes = ...,
         morse_signature: builtins.bytes = ...,
         service_config: pocket.shared.service_pb2.ApplicationServiceConfig | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["service_config", b"service_config"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["morse_signature", b"morse_signature", "morse_src_address", b"morse_src_address", "service_config", b"service_config", "shannon_dest_address", b"shannon_dest_address"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["morse_public_key", b"morse_public_key", "morse_signature", b"morse_signature", "morse_src_address", b"morse_src_address", "service_config", b"service_config", "shannon_dest_address", b"shannon_dest_address"]) -> None: ...
 
 global___MsgClaimMorseApplication = MsgClaimMorseApplication
 
@@ -298,6 +306,7 @@ class MsgClaimMorseSupplier(google.protobuf.message.Message):
 
     SHANNON_OWNER_ADDRESS_FIELD_NUMBER: builtins.int
     SHANNON_OPERATOR_ADDRESS_FIELD_NUMBER: builtins.int
+    MORSE_PUBLIC_KEY_FIELD_NUMBER: builtins.int
     MORSE_SRC_ADDRESS_FIELD_NUMBER: builtins.int
     MORSE_SIGNATURE_FIELD_NUMBER: builtins.int
     SERVICES_FIELD_NUMBER: builtins.int
@@ -311,6 +320,8 @@ class MsgClaimMorseSupplier(google.protobuf.message.Message):
     If empty, the shannon_owner_address will be used.
     See: https://dev.poktroll.com/operate/configs/supplier_staking_config#staking-types.
     """
+    morse_public_key: builtins.bytes
+    """The ed25519 public key of the morse account with morse_src_address."""
     morse_src_address: builtins.str
     """The hex-encoded address of the Morse account whose balance will be claimed.
     E.g.: 00f9900606fa3d5c9179fc0c8513078a53a2073e
@@ -332,11 +343,12 @@ class MsgClaimMorseSupplier(google.protobuf.message.Message):
         *,
         shannon_owner_address: builtins.str = ...,
         shannon_operator_address: builtins.str = ...,
+        morse_public_key: builtins.bytes = ...,
         morse_src_address: builtins.str = ...,
         morse_signature: builtins.bytes = ...,
         services: collections.abc.Iterable[pocket.shared.service_pb2.SupplierServiceConfig] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["morse_signature", b"morse_signature", "morse_src_address", b"morse_src_address", "services", b"services", "shannon_operator_address", b"shannon_operator_address", "shannon_owner_address", b"shannon_owner_address"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["morse_public_key", b"morse_public_key", "morse_signature", b"morse_signature", "morse_src_address", b"morse_src_address", "services", b"services", "shannon_operator_address", b"shannon_operator_address", "shannon_owner_address", b"shannon_owner_address"]) -> None: ...
 
 global___MsgClaimMorseSupplier = MsgClaimMorseSupplier
 

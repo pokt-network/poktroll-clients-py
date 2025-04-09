@@ -47,7 +47,6 @@ class MorseClaimableAccount(google.protobuf.message.Message):
 
     SHANNON_DEST_ADDRESS_FIELD_NUMBER: builtins.int
     MORSE_SRC_ADDRESS_FIELD_NUMBER: builtins.int
-    PUBLIC_KEY_FIELD_NUMBER: builtins.int
     UNSTAKED_BALANCE_FIELD_NUMBER: builtins.int
     SUPPLIER_STAKE_FIELD_NUMBER: builtins.int
     APPLICATION_STAKE_FIELD_NUMBER: builtins.int
@@ -58,8 +57,6 @@ class MorseClaimableAccount(google.protobuf.message.Message):
     """
     morse_src_address: builtins.str
     """The hex-encoded address of the Morse account whose balance will be claimed."""
-    public_key: builtins.bytes
-    """The ed25519 public key of the account."""
     claimed_at_height: builtins.int
     """The Shannon height at which the account was claimed.
     This field is intended to remain empty until the account has been claimed.
@@ -88,13 +85,12 @@ class MorseClaimableAccount(google.protobuf.message.Message):
         *,
         shannon_dest_address: builtins.str = ...,
         morse_src_address: builtins.str = ...,
-        public_key: builtins.bytes = ...,
         unstaked_balance: cosmos.base.v1beta1.coin_pb2.Coin | None = ...,
         supplier_stake: cosmos.base.v1beta1.coin_pb2.Coin | None = ...,
         application_stake: cosmos.base.v1beta1.coin_pb2.Coin | None = ...,
         claimed_at_height: builtins.int = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["application_stake", b"application_stake", "supplier_stake", b"supplier_stake", "unstaked_balance", b"unstaked_balance"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["application_stake", b"application_stake", "claimed_at_height", b"claimed_at_height", "morse_src_address", b"morse_src_address", "public_key", b"public_key", "shannon_dest_address", b"shannon_dest_address", "supplier_stake", b"supplier_stake", "unstaked_balance", b"unstaked_balance"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["application_stake", b"application_stake", "claimed_at_height", b"claimed_at_height", "morse_src_address", b"morse_src_address", "shannon_dest_address", b"shannon_dest_address", "supplier_stake", b"supplier_stake", "unstaked_balance", b"unstaked_balance"]) -> None: ...
 
 global___MorseClaimableAccount = MorseClaimableAccount

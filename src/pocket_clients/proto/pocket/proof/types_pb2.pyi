@@ -138,3 +138,37 @@ class Claim(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["proof_validation_status", b"proof_validation_status", "root_hash", b"root_hash", "session_header", b"session_header", "supplier_operator_address", b"supplier_operator_address"]) -> None: ...
 
 global___Claim = Claim
+
+@typing.final
+class SessionSMT(google.protobuf.message.Message):
+    """**************
+    OFFCHAIN TYPES
+    The messages defined below are used for offchain logic and should not be used for any onchain logic.
+    They are defined in the same file as the onchain types for convenience.
+    **************
+
+    SessionSMT is the serializable session's SMST used to persist the session's
+    state offchain by the RelayMiner.
+    It is not used for any onchain logic.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SESSION_HEADER_FIELD_NUMBER: builtins.int
+    SUPPLIER_OPERATOR_ADDRESS_FIELD_NUMBER: builtins.int
+    SMT_ROOT_FIELD_NUMBER: builtins.int
+    supplier_operator_address: builtins.str
+    smt_root: builtins.bytes
+    @property
+    def session_header(self) -> pocket.session.types_pb2.SessionHeader: ...
+    def __init__(
+        self,
+        *,
+        session_header: pocket.session.types_pb2.SessionHeader | None = ...,
+        supplier_operator_address: builtins.str = ...,
+        smt_root: builtins.bytes = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["session_header", b"session_header"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["session_header", b"session_header", "smt_root", b"smt_root", "supplier_operator_address", b"supplier_operator_address"]) -> None: ...
+
+global___SessionSMT = SessionSMT
