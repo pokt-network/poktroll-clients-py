@@ -38,6 +38,13 @@ class SerializedProto:
             data=(bytes(ffi.buffer(c_serialized_proto.data, c_serialized_proto.data_length))),
         )
 
+    @staticmethod
+    def from_proto(proto):
+        return SerializedProto(
+            type_url=proto.DESCRIPTOR.full_name,
+            data=proto.SerializeToString()
+        )
+
 
 class ProtoMessageArray:
     def __init__(self, messages=None):

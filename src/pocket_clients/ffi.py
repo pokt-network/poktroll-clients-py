@@ -20,6 +20,8 @@ thisDirPath = path.dirname(path.abspath(__file__))
 
 # Add complete struct definitions for CFFI
 ffi.cdef("""
+    typedef uint8_t morse_signature[64];
+
     typedef struct {
         unsigned char __size[40];
         long int __align;
@@ -61,6 +63,14 @@ ffi.cdef("""
     typedef void (callback_fn)(void *data, char **err);
 
     typedef int64_t go_ref;
+    
+    typedef struct gas_settings {
+        uint64_t gas_limit;
+        bool simulate;
+        char *gas_prices;
+        double gas_adjustment;
+        char *fees;
+    } gas_settings;
 
     void FreeGoMem(go_ref go_ref);
 
@@ -91,7 +101,7 @@ ffi.cdef("""
 
     go_ref NewBlockClient(go_ref deps_ref, char **err);
 
-    go_ref NewTxClient(go_ref deps_ref, char *signing_key_name, char **err);
+    go_ref NewTxClient(go_ref deps_ref, char *signing_key_name, gas_settings *gas_settings, char **err);
     go_ref TxClient_SignAndBroadcast(AsyncOperation* op, go_ref self_ref, serialized_proto *msg);
     go_ref TxClient_SignAndBroadcastMany(AsyncOperation* op, go_ref self_ref, proto_message_array *msgs);
     
@@ -144,6 +154,14 @@ ffi.cdef("""
     // proto_message_array* QueryClient_GetAllClaims(go_ref self_ref, char *address);
     // serialized_proto* QueryClient_GetProof(go_ref self_ref, char *address);
     // proto_message_array* QueryClient_GetAllProofs(go_ref self_ref, char *address);
+    
+    go_ref LoadMorsePrivateKey(char *morse_key_export_path, char *passphrase, char **err);
+    void SignMorseClaimMsg(serialized_proto *cSerializedProto, go_ref priv_key_ref, morse_signature out_morse_signature, char **err);
+    char* GetMorseAddress(go_ref priv_key_ref, char **err);
+    
+    serialized_proto *NewSerializedSignedMsgClaimMorseAccount(char *shannon_dest_address, go_ref morse_priv_key_ref, char **err);
+    serialized_proto *NewSerializedSignedMsgClaimMorseApplication(char *shannon_dest_address, go_ref morse_priv_key_ref, char *service_id, char **err);
+    serialized_proto *NewSerializedSignedMsgClaimMorseSupplier(char *shannon_owner_address, char *shannon_operator_address, go_ref morse_priv_key_ref,  proto_message_array *supplier_service_configs, char **err);
 """)
 
 

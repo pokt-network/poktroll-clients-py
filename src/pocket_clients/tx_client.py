@@ -20,6 +20,7 @@ from pocket_clients import (
     check_err,
     check_ref,
 )
+from pocket_clients.gas import GasSettings, DefaultGasSettings
 from pocket_clients.protobuf import SerializedProto, ProtoMessageArray
 
 
@@ -37,7 +38,8 @@ class TxClient(GoManagedMem):
                  signing_key_name: str,
                  deps_ref: go_ref = -1,
                  query_node_rpc_url: str = "",
-                 tx_node_rpc_url: str = ""):
+                 tx_node_rpc_url: str = "",
+                 gas_settings: GasSettings = DefaultGasSettings):
         """
         Constructor for TxClient.
 
@@ -53,11 +55,12 @@ class TxClient(GoManagedMem):
         if deps_ref == -1:
             deps_ref = _new_tx_client_depinject_config(query_node_rpc_url, tx_node_rpc_url)
 
-        go_ref = libpocket_clients.NewTxClient(deps_ref, signing_key_name.encode('utf-8'), self.err_ptr)
+        c_gas_settings = gas_settings.to_c_struct()
+        go_ref = libpocket_clients.NewTxClient(deps_ref,
+                                               signing_key_name.encode('utf-8'),
+                                               c_gas_settings,
+                                               self.err_ptr)
         super().__init__(go_ref)
-
-        check_err(self.err_ptr)
-        check_ref(go_ref)
 
     async def sign_and_broadcast(self, *msgs: Message) -> asyncio.Future:
         """
@@ -67,10 +70,7 @@ class TxClient(GoManagedMem):
         """
 
         serialized_msgs = ProtoMessageArray(messages=[
-            SerializedProto(
-                type_url=msg.DESCRIPTOR.full_name,
-                data=msg.SerializeToString()
-            ) for msg in msgs
+            SerializedProto.from_proto(msg) for msg in msgs
         ])
 
         # Get the C struct but KEEP A REFERENCE to serialized_msgs
@@ -85,7 +85,7 @@ class TxClient(GoManagedMem):
         # # This needs to be at the class level or function level to persist
         # self._last_serialized_msgs = serialized_msgs
 
-        err_ch_ref = libpocket_clients.TxClient_SignAndBroadcastMany(  # <-- line 71
+        err_ch_ref = libpocket_clients.TxClient_SignAndBroadcastMany(
             op,
             self.go_ref,
             c_serialized_msgs,

@@ -3,6 +3,7 @@
 isort:skip_file
 """
 
+import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
 import typing
@@ -15,8 +16,18 @@ class Params(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    WAIVE_MORSE_CLAIM_GAS_FEES_FIELD_NUMBER: builtins.int
+    waive_morse_claim_gas_fees: builtins.bool
+    """waive_morse_claim_gas_fees is a feature flag used to enable/disable the waiving of gas fees for txs that:
+    - Contain exactly one secp256k1 signer
+    - Contain at least one Morse account/actor claim messages
+    - Do not contain any other messages other than Morse account/actor claim messages
+    """
     def __init__(
         self,
+        *,
+        waive_morse_claim_gas_fees: builtins.bool = ...,
     ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["waive_morse_claim_gas_fees", b"waive_morse_claim_gas_fees"]) -> None: ...
 
 global___Params = Params
