@@ -25,7 +25,6 @@ app1_addr = "pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4"
 async def test_morse_migration():
     deps_ref = get_tx_client_deps()
     tx_client = TxClient("faucet", deps_ref, gas_settings=GasSettings(gas_limit=1000000))
-    # tx_client = TxClient("faucet", deps_ref)
 
     claim_messages = []
 
@@ -52,10 +51,6 @@ async def test_morse_migration():
                             service_id="anvil"
                         )
                         claim_messages.append(msg)
-                    # TODO_IN_THIS_COMMIT: fix Morse claim supplier msg serialization issue!!!
-                    # TODO_IN_THIS_COMMIT: fix Morse claim supplier msg serialization issue!!!
-                    # TODO_IN_THIS_COMMIT: fix Morse claim supplier msg serialization issue!!!
-                    # TODO_IN_THIS_COMMIT: fix Morse claim supplier msg serialization issue!!!
                     case 0:
                         msg, c_objects = new_signed_msg_claim_morse_supplier(
                             shannon_owner_address=faucet_addr,
