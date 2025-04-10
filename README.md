@@ -137,22 +137,22 @@ async def main():
                            query_node_rpc_url=query_node_rpc_url,
                            tx_node_rpc_url=tx_node_rpc_url)
 
-  # Stake and delegate application 3 to gateways 1 (in one tx)
-  await app_tx_client.sign_and_broadcast(
-    MsgStakeApplication(
-      address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
-      stake=Coin(denom="upokt", amount="100000000"),
-      services=[ApplicationServiceConfig(service_id="anvil")]
-    ),
-    *[MsgDelegateToGateway(
-      app_address=app3_addr,
-      gateway_address=gateway_addr,
-    ) for gateway_addr in [gateway1_addr, gateway2_addr]],
-  )
-
-  # Query all applications
-  applications = query_client.get_all_applications()
-  pprint(applications)
+    # Stake and delegate application 3 to gateways 1 & 2 (in one tx)
+    await app_tx_client.sign_and_broadcast(
+        MsgStakeApplication(
+            address="pokt1lqyu4v88vp8tzc86eaqr4lq8rwhssyn6rfwzex",
+            stake=Coin(denom="upokt", amount="100000000"),
+            services=[ApplicationServiceConfig(service_id="anvil")]
+        ),
+        *[MsgDelegateToGateway(
+            app_address=app3_addr,
+            gateway_address=gateway_addr,
+        ) for gateway_addr in [gateway1_addr, gateway2_addr]],
+    )
+    
+    # Query all applications
+    applications = query_client.get_all_applications()
+    pprint(applications)
 
   # Unstake application 3
   await app_tx_client.sign_and_broadcast(
