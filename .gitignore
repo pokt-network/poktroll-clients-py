@@ -150,3 +150,6 @@ Desktop.ini
 
 # Cython debug symbols
 cython_debug/
+
+morse_keys/
+scripts/morse_keygen
