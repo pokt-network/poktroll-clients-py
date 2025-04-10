@@ -1,7 +1,7 @@
 # `poktroll_clients` - Python Clients Library <!-- omit in toc -->
 
 An [`asyncio`](https://docs.python.org/3/library/asyncio.html) based, cross-platform
-Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/github.com/pokt-network/poktroll@v0.0.10/pkg/client)
+Python API which wraps the [`pocket` client packages](https://pkg.go.dev/github.com/pokt-network/pocket@v0.0.10/pkg/client) (formerly, `poktroll`)
 (via [`libpoktroll_clients`](https://github.com/pokt-network/libpoktroll-clients)).
 
 ## Table of Contents <!-- omit in toc -->
@@ -13,7 +13,7 @@ Python API which wraps the [`poktroll` client packages](https://pkg.go.dev/githu
     - [2. Download \& install the release wheel](#2-download--install-the-release-wheel)
     - [3. Download and unpack a release tarball](#3-download-and-unpack-a-release-tarball)
 - [Getting Started](#getting-started)
-  - [Start Poktroll Localnet](#start-poktroll-localnet)
+  - [Start Pocket Localnet](#start-pocket-localnet)
   - [Usage Examples](#usage-examples)
   - [Local Development Environment Setup](#local-development-environment-setup)
 
@@ -74,7 +74,7 @@ pipenv install ./poktroll_clients-0.2.0a0.dev1.tar.gz
 
 ## Getting Started
 
-### Start Poktroll Localnet
+### Start Pocket Localnet
 
 ```bash
 git clone https://github.com/pokt-network/poktroll
@@ -93,29 +93,29 @@ make acc_initialize_pubkeys
 ```python
 from pprint import pprint
 import asyncio
-from poktroll_clients.proto.poktroll.application.tx_pb2 import *
-from poktroll_clients.proto.poktroll.shared.service_pb2 import *
-from poktroll_clients.proto.cosmos.base.v1beta1.coin_pb2 import *
-from poktroll_clients import (
-    TxClient,
-    QueryClient,
+from pocket_clients.proto.pocket.application.tx_pb2 import *
+from pocket_clients.proto.pocket.shared.service_pb2 import *
+from pocket_clients.proto.cosmos.base.v1beta1.coin_pb2 import *
+from pocket_clients import (
+  TxClient,
+  QueryClient,
 )
 
 """
-Signing key name should match the name of a key in the local poktrolld keyring
+Signing key name should match the name of a key in the local pocketd keyring
 which is authorized to sign for any transactions the tx client will broadcast.
-See `poktrolld keys -h` for more information.
+See `pocketd keys -h` for more information.
 """
 signing_key_name = "key-name"
 
 """
-Query node RPC URL is the HTTP URL for the poktroll RPC endpoint to which query
+Query node RPC URL is the HTTP URL for the pocket RPC endpoint to which query
 clients will send requests.
 """
 query_node_rpc_url = "http://127.0.0.1:26657"
 
 """
-Tx node RPC URL is the gRPC gateway URL for the poktroll RPC endpoint to which the
+Tx node RPC URL is the gRPC gateway URL for the pocket RPC endpoint to which the
 tx client will connect and broadcast signed transactions. It MUST use the tcp:// scheme.
 """
 tx_node_rpc_url = "tcp://127.0.0.1:26657"
@@ -132,10 +132,10 @@ gateway2_addr = "pokt15w3fhfyc0lttv7r585e2ncpf6t2kl9uh8rsnyz"
 
 
 async def main():
-    # Application 3 tx client (app3 SHOULD NOT be staked)
-    app_tx_client = TxClient("app3",
-                             query_node_rpc_url=query_node_rpc_url,
-                             tx_node_rpc_url=tx_node_rpc_url)
+  # Application 3 tx client (app3 SHOULD NOT be staked)
+  app_tx_client = TxClient("app3",
+                           query_node_rpc_url=query_node_rpc_url,
+                           tx_node_rpc_url=tx_node_rpc_url)
 
     # Stake and delegate application 3 to gateways 1 & 2 (in one tx)
     await app_tx_client.sign_and_broadcast(
@@ -154,14 +154,14 @@ async def main():
     applications = query_client.get_all_applications()
     pprint(applications)
 
-    # Unstake application 3
-    await app_tx_client.sign_and_broadcast(
-        MsgUnstakeApplication(address=app3_addr),
-    )
+  # Unstake application 3
+  await app_tx_client.sign_and_broadcast(
+    MsgUnstakeApplication(address=app3_addr),
+  )
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+  asyncio.run(main())
 ```
 
 ### Local Development Environment Setup
@@ -176,7 +176,7 @@ pipenv install
 pipenv shell
 
 # (optional) Update protobufs ("pull" from buf.build)
-buf export buf.build/pokt-network/poktroll
+buf export buf.build/pokt-network/pocket
 
 # (optional) Re-generate protobufs & fix imports
 buf generate && python ./scripts/fix_proto_imports.py
@@ -189,7 +189,7 @@ pytest
 ```
 
 This step is optional, but necessary if you intend on developing, and locally integrating, modified versions of the `libpoktroll_clients` shared library.
-Otherwise, the steps in the [installation](#installation) section are sufficient to use and develop on the `poktroll_clients` python package (i.e., you can skip this step).
+Otherwise, the steps in the [installation](#installation) section are sufficient to use and develop on the `pocket_clients` python package (i.e., you can skip this step).
 
 ```bash
 git clone https://github.com/byanchriswhite/libpoktroll_clients

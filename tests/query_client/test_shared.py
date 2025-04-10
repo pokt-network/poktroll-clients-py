@@ -1,6 +1,6 @@
-from poktroll_clients import BlockQueryClient
-from poktroll_clients.proto.poktroll.shared.params_pb2 import Params as SharedParams
-from poktroll_clients.query_client import QueryClient
+from pocket_clients import BlockQueryClient
+from pocket_clients.proto.pocket.shared.params_pb2 import Params as SharedParams
+from pocket_clients.query_client import QueryClient
 
 
 def test_query_shared_session_windows():

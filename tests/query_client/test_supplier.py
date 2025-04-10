@@ -1,8 +1,8 @@
-from poktroll_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
-from poktroll_clients.proto.poktroll.shared.service_pb2 import ApplicationServiceConfig, SupplierServiceConfig, \
+from pocket_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
+from pocket_clients.proto.pocket.shared.service_pb2 import ApplicationServiceConfig, SupplierServiceConfig, \
     SupplierEndpoint, JSON_RPC, ServiceRevenueShare, REST
-from poktroll_clients.proto.poktroll.shared.supplier_pb2 import Supplier
-from poktroll_clients.query_client import QueryClient
+from pocket_clients.proto.pocket.shared.supplier_pb2 import Supplier
+from pocket_clients.query_client import QueryClient
 
 supplier1_addr = "pokt19a3t4yunp0dlpfjrp7qwnzwlrzd5fzs2gjaaaj"
 
@@ -64,7 +64,6 @@ def test_query_supplier():
                 ]
             )
         ],
-        services_activation_heights_map={},
         unstake_session_end_height=0,
     )
 

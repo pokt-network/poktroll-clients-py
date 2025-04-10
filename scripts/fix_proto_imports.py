@@ -34,7 +34,7 @@ def process_directory(directory: str, package_prefix: str) -> None:
                 rewrite_imports(file_path, package_prefix)
 
 if __name__ == '__main__':
-    proto_dir = Path('src/poktroll_clients/proto')
-    prefix = 'poktroll_clients.proto.'
+    proto_dir = Path('src/pocket_clients/proto')
+    prefix = 'pocket_clients.proto.'
     process_directory(str(proto_dir), prefix)
     print("Done processing protobuf imports!")

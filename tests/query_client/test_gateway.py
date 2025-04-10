@@ -1,5 +1,5 @@
-from poktroll_clients.proto.poktroll.gateway.types_pb2 import Gateway
-from poktroll_clients.query_client import QueryClient
+from pocket_clients.proto.pocket.gateway.types_pb2 import Gateway
+from pocket_clients.query_client import QueryClient
 
 gateway1_addr = "pokt15vzxjqklzjtlz7lahe8z2dfe9nm5vxwwmscne4"
 

@@ -1,12 +1,12 @@
 from typing_extensions import assert_type
 
-from poktroll_clients import (
+from pocket_clients import (
     BlockQueryClient,
     BlockClient,
     EventsQueryClient,
     SupplyMany,
 )
-from poktroll_clients.proto.tendermint.types.block_pb2 import Block
+from pocket_clients.proto.tendermint.types.block_pb2 import Block
 
 
 def test_block_query_client():

@@ -1,9 +1,9 @@
 from base64 import b64decode
 
-from poktroll_clients import BlockQueryClient
-from poktroll_clients.proto.poktroll.service.relay_mining_difficulty_pb2 import RelayMiningDifficulty
-from poktroll_clients.proto.poktroll.shared.service_pb2 import Service
-from poktroll_clients.query_client import QueryClient
+from pocket_clients import BlockQueryClient
+from pocket_clients.proto.pocket.service.relay_mining_difficulty_pb2 import RelayMiningDifficulty
+from pocket_clients.proto.pocket.shared.service_pb2 import Service
+from pocket_clients.query_client import QueryClient
 
 
 def test_query_get_service():

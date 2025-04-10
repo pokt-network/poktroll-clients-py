@@ -1,8 +1,8 @@
-from poktroll_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
-from poktroll_clients.proto.poktroll.application.types_pb2 import Application
-from poktroll_clients.proto.poktroll.shared.service_pb2 import SupplierServiceConfig, SupplierEndpoint, JSON_RPC, \
+from pocket_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
+from pocket_clients.proto.pocket.application.types_pb2 import Application
+from pocket_clients.proto.pocket.shared.service_pb2 import SupplierServiceConfig, SupplierEndpoint, JSON_RPC, \
     ApplicationServiceConfig
-from poktroll_clients.query_client import QueryClient
+from pocket_clients.query_client import QueryClient
 
 app1_addr = "pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4"
 gateway1_addr = "pokt15vzxjqklzjtlz7lahe8z2dfe9nm5vxwwmscne4"

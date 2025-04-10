@@ -1,4 +1,4 @@
-from poktroll_clients import (
+from pocket_clients import (
     BlockQueryClient,
     Supply,
     EventsQueryClient,

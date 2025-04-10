@@ -1,5 +1,5 @@
-from poktroll_clients.proto.poktroll.session.params_pb2 import Params as SessionParams
-from poktroll_clients.query_client import QueryClient
+from pocket_clients.proto.pocket.session.params_pb2 import Params as SessionParams
+from pocket_clients.query_client import QueryClient
 
 app1_addr = "pokt1mrqt5f7qh8uxs27cjm9t7v9e74a9vvdnq5jva4"
 

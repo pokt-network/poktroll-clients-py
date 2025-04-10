@@ -1,4 +1,4 @@
-from poktroll_clients.cases import camel_to_snake_case
+from pocket_clients.cases import camel_to_snake_case
 
 
 def test_camel_to_snake_case():

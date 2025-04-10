@@ -1,6 +1,6 @@
 version: v1
 plugins:
   - plugin: python
-    out: src/poktroll_clients/proto
+    out: src/pocket_clients/proto
   - plugin: mypy
-    out: src/poktroll_clients/proto
+    out: src/pocket_clients/proto
