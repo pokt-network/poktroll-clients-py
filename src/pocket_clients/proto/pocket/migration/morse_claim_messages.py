@@ -5,11 +5,12 @@ from nacl.signing import SigningKey
 
 from pocket_clients import ffi, check_err, libpocket_clients
 from pocket_clients.proto.pocket.shared.service_pb2 import SupplierServiceConfig
-from pocket_clients.protobuf import SerializedProto, deserialize_protobuf, ProtoMessageArray
+from pocket_clients.protobuf import SerializedProto, deserialize_protobuf, SerializedProtoArray
 
 
 def new_signed_msg_claim_morse_account(shannon_dest_address: str,
-                                       morse_priv_key_ref: ffi.CData) -> (Message, List[ffi.CData]):
+                                       morse_priv_key_ref: ffi.CData,
+                                       shannon_signing_address: str) -> (Message, List[ffi.CData]):
     c_objects = []
     err_ptr = ffi.new("char **")
     c_objects.append(err_ptr)
@@ -17,6 +18,7 @@ def new_signed_msg_claim_morse_account(shannon_dest_address: str,
     c_serialized_msg = libpocket_clients.NewSerializedSignedMsgClaimMorseAccount(
         shannon_dest_address.encode('utf-8'),
         morse_priv_key_ref,
+        shannon_signing_address.encode('utf-8'),
         err_ptr)
     check_err(err_ptr)
     c_objects.append(c_serialized_msg)
@@ -27,7 +29,8 @@ def new_signed_msg_claim_morse_account(shannon_dest_address: str,
 
 def new_signed_msg_claim_morse_application(shannon_dest_address: str,
                                            morse_priv_key_ref: ffi.CData,
-                                           service_id: str) -> (Message, List[ffi.CData]):
+                                           service_id: str,
+                                           shannon_signing_address: str) -> (Message, List[ffi.CData]):
     c_objects = []
     err_ptr = ffi.new("char **")
     c_objects.append(err_ptr)
@@ -35,7 +38,8 @@ def new_signed_msg_claim_morse_application(shannon_dest_address: str,
     c_serialized_msg = libpocket_clients.NewSerializedSignedMsgClaimMorseApplication(
         shannon_dest_address.encode('utf-8'),
         morse_priv_key_ref,
-        ffi.new("char[]", service_id.encode('utf-8')),
+        service_id.encode('utf-8'),
+        shannon_signing_address.encode('utf-8'),
         err_ptr)
     check_err(err_ptr)
     c_objects.append(c_serialized_msg)
@@ -47,13 +51,14 @@ def new_signed_msg_claim_morse_application(shannon_dest_address: str,
 def new_signed_msg_claim_morse_supplier(shannon_owner_address: str,
                                         shannon_operator_address: str,
                                         morse_priv_key_ref: ffi.CData,
-                                        supplier_service_configs: List[SupplierServiceConfig]) -> (
+                                        supplier_service_configs: List[SupplierServiceConfig],
+                                        shannon_signing_address: str) -> (
         Message, List[ffi.CData]):
     c_objects = []
     err_ptr = ffi.new("char **")
     c_objects.append(err_ptr)
 
-    c_supplier_service_configs = ProtoMessageArray(messages=[
+    c_supplier_service_configs = SerializedProtoArray(protos=[
         SerializedProto.from_proto(cfg) for cfg in supplier_service_configs
     ]).to_c_struct()
     c_objects.append(c_supplier_service_configs)
@@ -63,6 +68,7 @@ def new_signed_msg_claim_morse_supplier(shannon_owner_address: str,
         shannon_operator_address.encode('utf-8'),
         morse_priv_key_ref,
         c_supplier_service_configs,
+        shannon_signing_address.encode('utf-8'),
         err_ptr)
     check_err(err_ptr)
     c_objects.append(c_serialized_msg)

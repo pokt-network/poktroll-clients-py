@@ -4,6 +4,7 @@ from pprint import pprint
 from typing import List
 
 from google.protobuf import symbol_database, message
+from google.protobuf.message import Message
 
 from pocket_clients import go_ref, libpocket_clients, check_err
 from pocket_clients.cases import camel_to_snake_case
@@ -46,28 +47,28 @@ class SerializedProto:
         )
 
 
-class ProtoMessageArray:
-    def __init__(self, messages=None):
-        self.messages = messages or []
+class SerializedProtoArray:
+    def __init__(self, protos=None):
+        self.protos = protos or []
 
     def to_c_struct(self):
         # Keep all C objects alive for the lifetime of this object
         self._all_c_objects = []
 
         # Create array structure
-        c_array = ffi.new("proto_message_array *")
-        c_array.num_messages = len(self.messages)
+        c_array = ffi.new("serialized_proto_array *")
+        c_array.num_protos = len(self.protos)
 
         # Create serialized_proto array
-        c_messages = ffi.new(f"serialized_proto[{len(self.messages)}]")
-        c_array.messages = c_messages
+        c_messages = ffi.new(f"serialized_proto[{len(self.protos)}]")
+        c_array.protos = c_messages
 
         # Store references to prevent GC
         self._all_c_objects.append(c_array)
         self._all_c_objects.append(c_messages)
 
         # Create and fill each message
-        for i, msg in enumerate(self.messages):
+        for i, msg in enumerate(self.protos):
             # Create type_url buffer
             type_url_bytes = msg.type_url.encode('utf-8')
             c_type_url = ffi.new(f"uint8_t[{len(type_url_bytes)}]", type_url_bytes)
@@ -87,14 +88,17 @@ class ProtoMessageArray:
 
         return c_array
 
-    @staticmethod
-    def from_c_struct(c_proto_message_array: ffi.CData):
-        proto_message_array = ProtoMessageArray(messages=[])
-        for i in range(c_proto_message_array.num_messages):
-            serialized_proto = SerializedProto.from_c_struct(c_proto_message_array.messages[i])
-            proto_message_array.messages.append(serialized_proto)
+    def to_messages(self) -> List[Message]:
+        return [deserialize_protobuf(serialized_proto) for serialized_proto in self.protos]
 
-        return proto_message_array
+    @staticmethod
+    def from_c_struct(c_serialized_proto_array: ffi.CData):
+        serialized_proto_array = SerializedProtoArray(protos=[])
+        for i in range(c_serialized_proto_array.num_protos):
+            serialized_proto = SerializedProto.from_c_struct(c_serialized_proto_array.protos[i])
+            serialized_proto_array.protos.append(serialized_proto)
+
+        return serialized_proto_array
 
 
 def get_serialized_proto(go_proto_ref: go_ref) -> SerializedProto:

@@ -1,13 +1,10 @@
 import os
 from os import path
 
-import pkg_resources
 import pytest
 
 from pocket_clients import TxClient, libpocket_clients, ffi, check_err
 from pocket_clients.gas import GasSettings
-from pocket_clients.proto.cosmos.bank.v1beta1.tx_pb2 import MsgSend
-from pocket_clients.proto.cosmos.base.v1beta1.coin_pb2 import Coin
 from pocket_clients.proto.pocket.migration import (new_signed_msg_claim_morse_account,
                                                    new_signed_msg_claim_morse_application,
                                                    new_signed_msg_claim_morse_supplier)
@@ -42,13 +39,15 @@ async def test_morse_migration():
                         msg, c_objects = new_signed_msg_claim_morse_account(
                             shannon_dest_address=faucet_addr,
                             morse_priv_key_ref=morse_priv_key_ref,
+                            shannon_signing_address=faucet_addr,
                         )
                         claim_messages.append(msg)
                     case 2:
                         msg, c_objects = new_signed_msg_claim_morse_application(
                             shannon_dest_address=faucet_addr,
                             morse_priv_key_ref=morse_priv_key_ref,
-                            service_id="anvil"
+                            service_id="anvil",
+                            shannon_signing_address=faucet_addr,
                         )
                         claim_messages.append(msg)
                     case 0:
@@ -72,7 +71,8 @@ async def test_morse_migration():
                                         )
                                     ]
                                 )
-                            ]
+                            ],
+                            shannon_signing_address=faucet_addr,
                         )
                         claim_messages.append(msg)
 

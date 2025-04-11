@@ -21,7 +21,7 @@ from pocket_clients import (
     check_ref,
 )
 from pocket_clients.gas import GasSettings, DefaultGasSettings
-from pocket_clients.protobuf import SerializedProto, ProtoMessageArray
+from pocket_clients.protobuf import SerializedProto, SerializedProtoArray
 
 
 class TxClient(GoManagedMem):
@@ -69,26 +69,26 @@ class TxClient(GoManagedMem):
         :return: Future that completes when the transaction is processed.
         """
 
-        serialized_msgs = ProtoMessageArray(messages=[
+        serialized_protos = SerializedProtoArray(protos=[
             SerializedProto.from_proto(msg) for msg in msgs
         ])
 
-        # Get the C struct but KEEP A REFERENCE to serialized_msgs
+        # Get the C struct but KEEP A REFERENCE to serialized_protos
         # throughout the lifetime of this function
-        c_serialized_msgs = serialized_msgs.to_c_struct()
+        c_serialized_protos = serialized_protos.to_c_struct()
 
         # Store reference to prevent garbage collection
         # This needs to be at the class level or function level to persist
-        op, future = self._new_async_operation(serialized_msgs, c_serialized_msgs, c_serialized_msgs.messages)
+        op, future = self._new_async_operation(serialized_protos, c_serialized_protos, c_serialized_protos.protos)
 
         # # Store reference to prevent garbage collection
         # # This needs to be at the class level or function level to persist
-        # self._last_serialized_msgs = serialized_msgs
+        # self._last_serialized_msgs = serialized_protos
 
         err_ch_ref = libpocket_clients.TxClient_SignAndBroadcastMany(
             op,
             self.go_ref,
-            c_serialized_msgs,
+            c_serialized_protos,
         )
 
         if err_ch_ref == -1:

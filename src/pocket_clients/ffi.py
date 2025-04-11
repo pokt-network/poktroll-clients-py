@@ -85,9 +85,9 @@ ffi.cdef("""
     } serialized_proto;
 
     typedef struct {
-        serialized_proto* messages;
-        size_t num_messages;
-    } proto_message_array;
+        serialized_proto* protos;
+        size_t num_protos;
+    } serialized_proto_array;
     
     serialized_proto* GetGoProtoAsSerializedProto(go_ref go_proto_ref, char **err);
 
@@ -103,7 +103,7 @@ ffi.cdef("""
 
     go_ref NewTxClient(go_ref deps_ref, char *signing_key_name, gas_settings *gas_settings, char **err);
     go_ref TxClient_SignAndBroadcast(AsyncOperation* op, go_ref self_ref, serialized_proto *msg);
-    go_ref TxClient_SignAndBroadcastMany(AsyncOperation* op, go_ref self_ref, proto_message_array *msgs);
+    go_ref TxClient_SignAndBroadcastMany(AsyncOperation* op, go_ref self_ref, serialized_proto_array *msgs);
     
     go_ref NewQueryClient(go_ref deps_ref, char *query_node_rpc_url, char **err);
     
@@ -129,17 +129,17 @@ ffi.cdef("""
     
     // Application module query methods
     serialized_proto* QueryClient_GetApplication(go_ref self_ref, char *address, char **err);
-    proto_message_array* QueryClient_GetAllApplications(go_ref self_ref, char **err);
+    serialized_proto_array* QueryClient_GetAllApplications(go_ref self_ref, char **err);
     
     // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Gateway module query methods
     // serialized_proto* QueryClient_GetGateway(go_ref self_ref, char *address, char **err);
-    // proto_message_array* QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
+    // serialized_proto_array* QueryClient_GetAllGateways(go_ref self_ref, char *address, char **err);
     
     // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Supplier module query methods
     serialized_proto* QueryClient_GetSupplier(go_ref self_ref, char *address, char **err);
-    // proto_message_array* QueryClient_GetAllSuppliers(go_ref self_ref, char *address);
+    // serialized_proto_array* QueryClient_GetAllSuppliers(go_ref self_ref, char *address);
     
     // Session module query methods
     serialized_proto* QueryClient_GetSession(go_ref self_ref, char* app_address, char* service_id, int64_t block_height, char **err);
@@ -151,17 +151,21 @@ ffi.cdef("""
     // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Proof module query methods
     // serialized_proto* QueryClient_GetClaim(go_ref self_ref, char *address);
-    // proto_message_array* QueryClient_GetAllClaims(go_ref self_ref, char *address);
+    // serialized_proto_array* QueryClient_GetAllClaims(go_ref self_ref, char *address);
     // serialized_proto* QueryClient_GetProof(go_ref self_ref, char *address);
-    // proto_message_array* QueryClient_GetAllProofs(go_ref self_ref, char *address);
+    // serialized_proto_array* QueryClient_GetAllProofs(go_ref self_ref, char *address);
     
     go_ref LoadMorsePrivateKey(char *morse_key_export_path, char *passphrase, char **err);
     void SignMorseClaimMsg(serialized_proto *cSerializedProto, go_ref priv_key_ref, morse_signature out_morse_signature, char **err);
     char* GetMorseAddress(go_ref priv_key_ref, char **err);
     
-    serialized_proto *NewSerializedSignedMsgClaimMorseAccount(char *shannon_dest_address, go_ref morse_priv_key_ref, char **err);
-    serialized_proto *NewSerializedSignedMsgClaimMorseApplication(char *shannon_dest_address, go_ref morse_priv_key_ref, char *service_id, char **err);
-    serialized_proto *NewSerializedSignedMsgClaimMorseSupplier(char *shannon_owner_address, char *shannon_operator_address, go_ref morse_priv_key_ref,  proto_message_array *supplier_service_configs, char **err);
+    serialized_proto *NewSerializedSignedMsgClaimMorseAccount(char *shannon_dest_address, go_ref morse_priv_key_ref, char *shannon_signing_address, char **err);
+    serialized_proto *NewSerializedSignedMsgClaimMorseApplication(char *shannon_dest_address, go_ref morse_priv_key_ref, char *service_id, char *shannon_signing_address, char **err);
+    serialized_proto *NewSerializedSignedMsgClaimMorseSupplier(char *shannon_owner_address, char *shannon_operator_address, go_ref morse_priv_key_ref,  serialized_proto_array *supplier_service_configs, char *shannon_signing_address, char **err);
+    
+    serialized_proto *QueryClient_GetMigrationParams(go_ref client_ref, char **err);
+    serialized_proto_array *QueryClient_GetMorseClaimableAccounts(go_ref client_ref, char **err);
+    serialized_proto *QueryClient_GetMorseClaimableAccount(go_ref client_ref, char *morse_account_address, char **err);
 """)
 
 
@@ -262,6 +266,7 @@ def get_packaged_library_path() -> Path:
 
 lib_dir = path.join(path.dirname(path.abspath(__file__)), "lib")
 if platform == "darwin":
+    # lib_path_var = "LIB_PATH"
     lib_path_var = "DYLD_LIBRARY_PATH"
 elif platform == "win32":
     lib_path_var = "PATH"

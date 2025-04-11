@@ -1,3 +1,5 @@
+from typing import List
+
 from pocket_clients import (
     go_ref,
     ffi,
@@ -5,7 +7,9 @@ from pocket_clients import (
     GoManagedMem, BlockQueryClient, Supply, check_err, check_ref,
 )
 from pocket_clients.proto.pocket.application.types_pb2 import Application
-from pocket_clients.proto.pocket.gateway.types_pb2 import Gateway
+from pocket_clients.proto.pocket.migration.morse_onchain_pb2 import MorseClaimableAccount
+from pocket_clients.proto.pocket.migration.params_pb2 import Params as MigrationParams
+from pocket_clients.proto.pocket.service.relay_mining_difficulty_pb2 import RelayMiningDifficulty
 from pocket_clients.proto.pocket.session.params_pb2 import Params as SessionParams
 from pocket_clients.proto.pocket.session.types_pb2 import Session
 from pocket_clients.proto.pocket.shared.params_pb2 import Params as SharedParams
@@ -13,7 +17,7 @@ from pocket_clients.proto.pocket.proof.params_pb2 import Params as ProofParams
 from pocket_clients.proto.pocket.application.params_pb2 import Params as ApplicationParams
 from pocket_clients.proto.pocket.shared.service_pb2 import Service
 from pocket_clients.proto.pocket.shared.supplier_pb2 import Supplier
-from pocket_clients.protobuf import get_proto_from_go_ref, SerializedProto, deserialize_protobuf, ProtoMessageArray
+from pocket_clients.protobuf import get_proto_from_go_ref, SerializedProto, deserialize_protobuf, SerializedProtoArray
 
 
 class QueryClient(GoManagedMem):
@@ -144,12 +148,12 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_app)
 
     def get_all_applications(self) -> list[Application]:
-        c_proto_message_array = libpocket_clients.QueryClient_GetAllApplications(self.go_ref, self.err_ptr)
+        c_serialized_proto_array = libpocket_clients.QueryClient_GetAllApplications(self.go_ref, self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
         check_err(self.err_ptr)
 
-        proto_message_array = ProtoMessageArray.from_c_struct(c_proto_message_array)
-        return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
+        serialized_proto_array = SerializedProtoArray.from_c_struct(c_serialized_proto_array)
+        return [deserialize_protobuf(serialized_proto) for serialized_proto in serialized_proto_array.protos]
 
     # def get_gateway(self, gateway_address: str) -> Gateway:
     #     c_serialized_gateway = libpocket_clients.QueryClient_GetGateway(
@@ -161,12 +165,12 @@ class QueryClient(GoManagedMem):
     #     return deserialize_protobuf(serialized_gateway)
     #
     # def get_all_gateways(self) -> list[Gateway]:
-    #     c_proto_message_array = libpocket_clients.QueryClient_GetAllGateways(self.go_ref, self.err_ptr)
+    #     c_serialized_proto_array = libpocket_clients.QueryClient_GetAllGateways(self.go_ref, self.err_ptr)
     #     # TODO_IN_THIS_COMMIT: free the C struct and its members
     #     check_err(self.err_ptr)
     #
-    #     proto_message_array = ProtoMessageArray.from_c_struct(c_proto_message_array)
-    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
+    #     serialized_proto_array = ProtoMessageArray.from_c_struct(c_serialized_proto_array)
+    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in serialized_proto_array.messages]
 
     def get_supplier(self, supplier_operator_address: str) -> Supplier:
         c_serialized_supplier = libpocket_clients.QueryClient_GetSupplier(
@@ -178,12 +182,12 @@ class QueryClient(GoManagedMem):
         return deserialize_protobuf(serialized_supplier)
 
     # def get_all_suppliers(self) -> list[Supplier]:
-    #     c_proto_message_array = libpocket_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
+    #     c_serialized_proto_array = libpocket_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
     #     # TODO_IN_THIS_COMMIT: free the C struct and its members
     #     check_err(self.err_ptr)
     #
-    #     proto_message_array = ProtoMessageArray.from_c_struct(c_proto_message_array)
-    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in proto_message_array.messages]
+    #     serialized_proto_array = ProtoMessageArray.from_c_struct(c_serialized_proto_array)
+    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in serialized_proto_array.messages]
 
     def get_session(self, app_address: str, service_id: str, block_height: int) -> Session:
         c_serialized_session = libpocket_clients.QueryClient_GetSession(
@@ -203,7 +207,7 @@ class QueryClient(GoManagedMem):
         serialized_service = SerializedProto.from_c_struct(c_serialized_service)
         return deserialize_protobuf(serialized_service)
 
-    def get_service_relay_difficulty(self, service_id: str) -> int:
+    def get_service_relay_difficulty(self, service_id: str) -> RelayMiningDifficulty:
         c_service_relay_difficulty = libpocket_clients.QueryClient_GetServiceRelayDifficulty(
             self.go_ref, service_id.encode('utf-8'), self.err_ptr)
         # TODO_IN_THIS_COMMIT: free the C struct and its members
@@ -212,6 +216,35 @@ class QueryClient(GoManagedMem):
 
         serialized_service_relay_difficulty = SerializedProto.from_c_struct(c_service_relay_difficulty)
         return deserialize_protobuf(serialized_service_relay_difficulty)
+
+    def get_morse_claimable_accounts(self) -> List[MorseClaimableAccount] | None:
+        c_morse_claimable_accounts = libpocket_clients.QueryClient_GetMorseClaimableAccounts(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+
+        if c_morse_claimable_accounts == ffi.NULL:
+            return None
+
+        proto_array_morse_accounts = SerializedProtoArray.from_c_struct(c_morse_claimable_accounts)
+        return proto_array_morse_accounts.to_messages()
+
+    def get_morse_claimable_account(self, morse_account_address: str) -> MorseClaimableAccount | None:
+        c_morse_address = ffi.new("char[]", morse_account_address.encode('utf-8'))
+        c_morse_claimable_account = libpocket_clients.QueryClient_GetMorseClaimableAccount(
+            self.go_ref, c_morse_address, self.err_ptr)
+        check_err(self.err_ptr)
+
+        if c_morse_claimable_account == ffi.NULL:
+            return None
+
+        serialized_morse_claimable_account = SerializedProto.from_c_struct(c_morse_claimable_account)
+        return deserialize_protobuf(serialized_morse_claimable_account)
+
+    def get_migration_params(self) -> MigrationParams:
+        c_serialized_migration_params = libpocket_clients.QueryClient_GetMigrationParams(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+
+        serialized_migration_params = SerializedProto.from_c_struct(c_serialized_migration_params)
+        return deserialize_protobuf(serialized_migration_params)
 
 
 def _new_query_client_depinject_config(
