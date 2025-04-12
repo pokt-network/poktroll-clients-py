@@ -181,13 +181,12 @@ class QueryClient(GoManagedMem):
         serialized_supplier = SerializedProto.from_c_struct(c_serialized_supplier)
         return deserialize_protobuf(serialized_supplier)
 
-    # def get_all_suppliers(self) -> list[Supplier]:
-    #     c_serialized_proto_array = libpocket_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
-    #     # TODO_IN_THIS_COMMIT: free the C struct and its members
-    #     check_err(self.err_ptr)
-    #
-    #     serialized_proto_array = ProtoMessageArray.from_c_struct(c_serialized_proto_array)
-    #     return [deserialize_protobuf(serialized_proto) for serialized_proto in serialized_proto_array.messages]
+    def get_all_suppliers(self) -> list[Supplier]:
+        c_serialized_proto_array = libpocket_clients.QueryClient_GetAllSuppliers(self.go_ref, self.err_ptr)
+        check_err(self.err_ptr)
+
+        serialized_proto_array = SerializedProtoArray.from_c_struct(c_serialized_proto_array)
+        return [deserialize_protobuf(serialized_proto) for serialized_proto in serialized_proto_array.protos]
 
     def get_session(self, app_address: str, service_id: str, block_height: int) -> Session:
         c_serialized_session = libpocket_clients.QueryClient_GetSession(

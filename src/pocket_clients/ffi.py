@@ -139,7 +139,7 @@ ffi.cdef("""
     // TODO_BLOCKED(@bryanchriswhite): add commented method exports once available.
     // Supplier module query methods
     serialized_proto* QueryClient_GetSupplier(go_ref self_ref, char *address, char **err);
-    // serialized_proto_array* QueryClient_GetAllSuppliers(go_ref self_ref, char *address);
+    serialized_proto_array* QueryClient_GetAllSuppliers(go_ref self_ref, char *address);
     
     // Session module query methods
     serialized_proto* QueryClient_GetSession(go_ref self_ref, char* app_address, char* service_id, int64_t block_height, char **err);
