@@ -1,6 +1,8 @@
 module github.com/pokt-network/poktroll-clients-py
 
-replace github.com/pokt-network/poktroll => ../pocket
+// DEV_NOTE: uncomment to use the local pocket repo.
+//replace github.com/pokt-network/poktroll => ../pocket
+replace github.com/pokt-network/poktroll => github.com/pokt-network/poktroll v0.0.0-20250411235754-a42def629dca
 
 replace nhooyr.io/websocket => github.com/coder/websocket v1.8.6
 
