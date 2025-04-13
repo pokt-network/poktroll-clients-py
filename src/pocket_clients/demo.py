@@ -28,22 +28,25 @@ with os.scandir(morse_keys_dir) as dir_iterator:
 
 morse_priv_keys = {
     "bob": {
-
+        "unstaked_1": load_morse_key(0, morse_addresses[0]),
+        "unstaked_2": load_morse_key(6, morse_addresses[6]),
+        "application": load_morse_key(1, morse_addresses[1]),
     },
     "alice": {
-
+        "unstaked_1": load_morse_key(2, morse_addresses[2]),
+        "supplier": load_morse_key(3, morse_addresses[3]),
     }
 }
 
 morse_src_addrs = {
     "bob": {
         "unstaked_1": morse_addresses[0],
-        "unstaked_2": morse_addresses[1],
-        "application": morse_addresses[2],
+        "unstaked_2": morse_addresses[3],
+        "application": morse_addresses[1],
     },
     "alice": {
-        "unstaked_1": morse_addresses[3],
-        "supplier": morse_addresses[4],
+        "unstaked_1": morse_addresses[6],
+        "supplier": morse_addresses[2],
     }
 }
 
@@ -70,20 +73,20 @@ shannon_signers = {
 }
 
 bob_claim_unstaked1_msg, _ = new_signed_msg_claim_morse_account(
-    shannon_dest_address=morse_addresses[0],
-    morse_priv_key_ref=load_morse_key(0, morse_addresses[0]),
+    shannon_dest_address=shannon_dest_addrs["bob"]["unstaked"],
+    morse_priv_key_ref=morse_priv_keys["bob"]["unstaked_1"],
     shannon_signing_address=shannon_signers["bob"]["address"],
 )
 
 bob_claim_unstaked2_msg, _ = new_signed_msg_claim_morse_account(
-    shannon_dest_address=morse_addresses[0],
-    morse_priv_key_ref=load_morse_key(0, morse_addresses[0]),
+    shannon_dest_address=shannon_dest_addrs["bob"]["unstaked"],
+    morse_priv_key_ref=morse_priv_keys["bob"]["unstaked_2"],
     shannon_signing_address=shannon_signers["bob"]["address"],
 )
 
 bob_claim_application_msg, _ = new_signed_msg_claim_morse_application(
     shannon_dest_address=shannon_dest_addrs["bob"]["application"],
-    morse_priv_key_ref=load_morse_key(2, morse_addresses[2]),
+    morse_priv_key_ref=morse_priv_keys["bob"]["application"],
     service_id="anvil",
     shannon_signing_address=shannon_signers["bob"]["address"],
 )
@@ -95,15 +98,15 @@ bob_claim_msgs = [
 ]
 
 alice_claim_unstaked1_msg, _ = new_signed_msg_claim_morse_account(
-    shannon_dest_address=morse_addresses[3],
-    morse_priv_key_ref=load_morse_key(3, morse_addresses[3]),
+    shannon_dest_address=shannon_dest_addrs["alice"]["unstaked"],
+    morse_priv_key_ref=morse_priv_keys["alice"]["unstaked"],
     shannon_signing_address=shannon_signers["alice"]["address"],
 )
 
 alice_claim_supplier_msg, _ = new_signed_msg_claim_morse_supplier(
-    shannon_owner_address=shannon_dest_addrs["alice"]["unstaked"],
-    shannon_operator_address=shannon_dest_addrs["alice"]["unstaked"],
-    morse_priv_key_ref=load_morse_key(4, morse_addresses[4]),
+    shannon_owner_address=shannon_dest_addrs["alice"]["supplier"],
+    shannon_operator_address=shannon_dest_addrs["alice"]["supplier"],
+    morse_priv_key_ref=morse_priv_keys["alice"]["supplier"],
     supplier_service_configs=[
         SupplierServiceConfig(
             service_id="anvil",
@@ -115,7 +118,7 @@ alice_claim_supplier_msg, _ = new_signed_msg_claim_morse_supplier(
             ],
             rev_share=[
                 ServiceRevenueShare(
-                    address=shannon_dest_addrs["alice"]["unstaked"],
+                    address=shannon_dest_addrs["alice"]["supplier"],
                     rev_share_percentage=100
                 )
             ]
