@@ -22,9 +22,6 @@ Objectives
     - Staked application
     - Staked supplier/servicer
 
-<!-- end_slide -->
-
-Claiming Morse Accounts via Python
----
+<!-- pause -->
 
 While we wait for LocalNet to finish comint up, let's take a look at the demo code we'll be working with...

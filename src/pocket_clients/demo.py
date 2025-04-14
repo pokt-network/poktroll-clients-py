@@ -1,43 +1,33 @@
-import os
-from os import path
-
 from pocket_clients import TxClient, QueryClient, ffi, libpocket_clients, check_err
-from pocket_clients.proto.pocket.migration import new_signed_msg_claim_morse_account, \
-    new_signed_msg_claim_morse_application, new_signed_msg_claim_morse_supplier
-from pocket_clients.proto.pocket.shared.service_pb2 import SupplierServiceConfig, SupplierEndpoint, ServiceRevenueShare, \
-    JSON_RPC
+from pocket_clients.proto.pocket.migration import new_signed_msg_claim_morse_account, new_signed_msg_claim_morse_application, new_signed_msg_claim_morse_supplier
+from pocket_clients.proto.pocket.shared.service_pb2 import SupplierServiceConfig, SupplierEndpoint, ServiceRevenueShare, JSON_RPC
+
+from demo_prez.keys import load_morse_key, morse_addresses
 from tests.test_tx_client import get_tx_client_deps
 
-project_root = path.abspath(path.join(path.dirname(__file__), "..", ".."))
-morse_keys_dir = path.join(project_root, "morse_keys")
+# Initialize a client for querying onchain data.
+query_client = QueryClient("http://127.0.0.1:26657")
 
-def load_morse_key(idx: int, address: str) -> ffi.CData:
-    err_ptr = ffi.new("char **")
-    morse_export_key_path = path.join(morse_keys_dir, f"{idx}_{address}.key").encode('utf-8')
-    morse_priv_key_ref = libpocket_clients.LoadMorsePrivateKey(morse_export_key_path, ffi.NULL,
-                                                               err_ptr)
-    check_err(err_ptr)
-    return morse_priv_key_ref
+# Initialize clients for signing & broadcasting Morse claim transactions.
+# NOTE: Simone is signing on behalf of Alice to demonstrate custodial claiming.
+bob_tx_client = TxClient("bob_unstaked", get_tx_client_deps())
+simone_tx_client = TxClient("simone", get_tx_client_deps())
 
-
-morse_addresses = []
-with os.scandir(morse_keys_dir) as dir_iterator:
-    for key_idx, file in enumerate(dir_iterator):
-        if not file.name.startswith(".") and file.is_file() and file.name.endswith(".key"):
-            morse_addresses.append(file.name[2:-4])
-
+# A dictionary of Morse private keys, grouped by user and account.
 morse_priv_keys = {
     "bob": {
         "unstaked_1": load_morse_key(0, morse_addresses[0]),
-        "unstaked_2": load_morse_key(6, morse_addresses[6]),
+        "unstaked_2": load_morse_key(3, morse_addresses[3]),
         "application": load_morse_key(1, morse_addresses[1]),
     },
     "alice": {
-        "unstaked_1": load_morse_key(2, morse_addresses[2]),
-        "supplier": load_morse_key(3, morse_addresses[3]),
+        "unstaked": load_morse_key(6, morse_addresses[6]),
+        "supplier": load_morse_key(2, morse_addresses[2]),
     }
 }
 
+# A dictionary of Morse source addresses, grouped by user.
+# Each user can have multiple Morse accounts, which map to distinct Morse addresses.
 morse_src_addrs = {
     "bob": {
         "unstaked_1": morse_addresses[0],
@@ -45,33 +35,41 @@ morse_src_addrs = {
         "application": morse_addresses[1],
     },
     "alice": {
-        "unstaked_1": morse_addresses[6],
+        "unstaked": morse_addresses[6],
         "supplier": morse_addresses[2],
     }
 }
 
+# A dictionary of Shannon destination addresses, grouped by user.
+# Each user may have multiple Shannon accounts (key names), which
+# map to distinct Shannon addresses.
 shannon_dest_addrs = {
     "bob": {
         "unstaked": "pokt15rpjxjn6vuq78ymmdw2ump8vvvmgg5ap26qrag",
         "application": "pokt1fffmhccye0kj22sr7s0lfv4wg7ys6sma43q6hs",
 },
     "alice": {
-        "unstaked": "pokt1kz85ph0xwjtus6d8vh56wgpwa8ud2gt4q5fge4",
-        "supplier": "pokt1zdxqawdl05dtlzat9w48m02cpapu824fc6hdsd"
+        "supplier_operator": "pokt1hkcslgef4l88xncjq592v04q6gu06puur48zaw",
+        "supplier_owner": "pokt1257n0hnn84g08p4rmf9q0p4nztnlukqpvaydng"
     }
 }
 
+# A dictionary of Shannon key names/addrs to be used for signing the Morse claims.
+# Each Morse account/actor claim transaction will use a single Shannon signing account.
+# In Alice's case, the Simone user will be responsible for signing to demonstrate
+# custodial account/actor claiming.
 shannon_signers = {
     "bob": {
         "key_name": "bob_unstaked",
         "address": "pokt15rpjxjn6vuq78ymmdw2ump8vvvmgg5ap26qrag",
     },
     "alice": {
-        "key_name": "dave",
+        "key_name": "simone",
         "address": "pokt17uqecvr6mck693ydpznp384kxhqe57strc4vv6",
     }
 }
 
+# Bob's account/actor claim messages.
 bob_claim_unstaked1_msg, _ = new_signed_msg_claim_morse_account(
     shannon_dest_address=shannon_dest_addrs["bob"]["unstaked"],
     morse_priv_key_ref=morse_priv_keys["bob"]["unstaked_1"],
@@ -96,16 +94,18 @@ bob_claim_msgs = [
     bob_claim_unstaked2_msg,
     bob_claim_application_msg,
 ]
+# ---
 
-alice_claim_unstaked1_msg, _ = new_signed_msg_claim_morse_account(
-    shannon_dest_address=shannon_dest_addrs["alice"]["unstaked"],
+# Alice's Morse account/actor claim messages.
+alice_claim_unstaked_as_supplier_owner_msg, _ = new_signed_msg_claim_morse_account(
+    shannon_dest_address=shannon_dest_addrs["alice"]["supplier_owner"],
     morse_priv_key_ref=morse_priv_keys["alice"]["unstaked"],
     shannon_signing_address=shannon_signers["alice"]["address"],
 )
 
 alice_claim_supplier_msg, _ = new_signed_msg_claim_morse_supplier(
-    shannon_owner_address=shannon_dest_addrs["alice"]["supplier"],
-    shannon_operator_address=shannon_dest_addrs["alice"]["supplier"],
+    shannon_owner_address=shannon_dest_addrs["alice"]["supplier_owner"],
+    shannon_operator_address=shannon_dest_addrs["alice"]["supplier_operator"],
     morse_priv_key_ref=morse_priv_keys["alice"]["supplier"],
     supplier_service_configs=[
         SupplierServiceConfig(
@@ -118,7 +118,7 @@ alice_claim_supplier_msg, _ = new_signed_msg_claim_morse_supplier(
             ],
             rev_share=[
                 ServiceRevenueShare(
-                    address=shannon_dest_addrs["alice"]["supplier"],
+                    address=shannon_dest_addrs["alice"]["supplier_owner"],
                     rev_share_percentage=100
                 )
             ]
@@ -128,11 +128,7 @@ alice_claim_supplier_msg, _ = new_signed_msg_claim_morse_supplier(
 )
 
 alice_claim_msgs = [
-    alice_claim_unstaked1_msg,
+    alice_claim_unstaked_as_supplier_owner_msg,
     alice_claim_supplier_msg,
 ]
-
-query_client = QueryClient("http://127.0.0.1:26657")
-
-bob_tx_client = TxClient("bob_unstaked", get_tx_client_deps())
-dave_tx_client = TxClient("dave", get_tx_client_deps())
+# ---
